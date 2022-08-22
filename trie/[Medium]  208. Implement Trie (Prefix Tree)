@@ -1,0 +1,63 @@
+struct trieNode{
+    vector<trieNode*> children;
+    bool end{false};
+
+    trieNode(): children(26, nullptr){}
+    ~trieNode(){
+        for (auto child: children){
+            if (child) delete child;
+        }
+    }
+};
+
+class Trie {
+public:
+
+    trieNode *root = new trieNode();
+    
+    void insert(string word) {
+        trieNode* looper = root;
+        for (auto ch: word){
+            if (!looper->children[ch - 'a']){
+                looper->children[ch- 'a'] = new trieNode();
+            }
+            looper = looper->children[ch - 'a'];
+        }
+        looper->end = true;
+    }
+    
+    bool search(string word) {
+        trieNode* looper = root;
+        for (auto ch: word){
+            if (looper->children[ch - 'a']){
+                looper = looper->children[ch - 'a'];
+            }
+            else{
+                return false;
+            } 
+        }
+        if (looper->end == true){return true;}
+        else return false;
+    }
+    
+    bool startsWith(string prefix) {
+        trieNode* looper = root;
+        for (auto ch: prefix){
+            if (looper->children[ch - 'a']){
+                looper = looper->children[ch - 'a'];
+            }
+            else{
+                return false;
+            } 
+        }
+        return true;
+    }
+};
+
+/**
+ * Your Trie object will be instantiated and called as such:
+ * Trie* obj = new Trie();
+ * obj->insert(word);
+ * bool param_2 = obj->search(word);
+ * bool param_3 = obj->startsWith(prefix);
+ */
