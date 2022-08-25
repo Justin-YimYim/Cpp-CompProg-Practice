@@ -1,5 +1,6 @@
 // Unable to finish all test cases without using trie to cache
 // implementation of cache is impossible in this algorithm
+// 42 / 63 test cases passed.
 
 #include <vector>
 #include <unordered_map>
