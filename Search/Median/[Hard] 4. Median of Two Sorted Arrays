@@ -1,3 +1,4 @@
+// Find medina => no need concern how the sort only need to make into two containers then find max and min of the two contianers
 // Median = sum of two numbers / 2
 // Search = find the requirement satisfy two numbers
 
