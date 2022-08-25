@@ -1,0 +1,70 @@
+// Unable to finish all test cases without using trie to cache
+// implementation of cache is impossible in this algorithm
+
+#include <vector>
+#include <unordered_map>
+
+typedef vector<vector<int>> vector_2d;
+typedef unordered_map<char, vector_2d> dict;
+
+
+class Solution {
+public:    
+    bool check_in_dic(string word, dict & world_map, vector_2d walked, const vector<int> current, const int n, const int m){
+        if (word.empty()) {
+            return true;
+        }
+        else if (walked.empty()){
+            if (world_map.count(word[0]) == 0){
+                return false;
+            }
+            else{
+                for (auto pos: world_map[word[0]]){
+                    walked.push_back(pos);
+                    if (check_in_dic(word.substr(1), world_map, walked, pos, n, m)) return true;
+                    walked.pop_back();
+                }
+            }
+        }
+        else{
+            cout << current[0] << " " << current[1] << endl;
+            vector_2d trans = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+            for (auto tran: trans){
+                vector<int> new_pos = {current[0] + tran[0], current[1] + tran[1]};
+                if (new_pos[0] < 0 || new_pos[0] > n || new_pos[1] < 0 || new_pos[1] > m || find(walked.begin(), walked.end(), new_pos) != walked.end()){
+                    
+                }
+                else if (find(world_map[word[0]].begin(), world_map[word[0]].end(), new_pos) != world_map[word[0]].end()){
+                    walked.push_back(new_pos);
+                    if (check_in_dic(word.substr(1), world_map, walked, new_pos, n, m)) return true;
+                    walked.pop_back();
+                }
+            } 
+        }
+        return false;
+    }
+    
+    vector<string> findWords(vector<vector<char>>& board, vector<string>& words) {
+        unordered_map<char, vector_2d> world_map;
+        const int n{static_cast<int> (board.size())};
+        const int m{static_cast<int> (board[0].size())};
+        
+        for (int i{0}; i < n; i++){
+            for (int k{0}; k < m; k++){
+                world_map[board[i][k]].push_back({i, k});
+            }
+        }
+        
+        vector<string> ans;
+        vector_2d walked;
+        vector<int> current;
+        
+        for (auto &word : words ){
+            if (check_in_dic(word, world_map, walked, current, n, m) == true){
+                ans.push_back(word);
+            }
+        }
+        
+        return ans;
+    }    
+};
