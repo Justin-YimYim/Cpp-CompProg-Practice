@@ -1,0 +1,39 @@
+// Run Time Error/ Brute Force/ 152 / 353 test cases passed.
+
+class Solution {
+public:
+    bool isMatch(string &a, string &b, int pa=0, int pb=0){
+    int lenB = b.size();
+    int lenA = a.size();
+    if (lenB == pb && lenA == pa) return true;
+
+    if (pb < lenB - 1){
+        if (b[pb + 1] == '*'){
+            if (isMatch(a, b, pa, pb + 1)) return true;
+        }
+    }
+
+    if(a[pa] == b[pb] || b[pb] == '.'){
+        if (isMatch(a, b, pa + 1, pb + 1)) return true;
+    }
+    else if (b[pb] == '*'){
+        if (b[pb - 1] == '.'){
+            if (pb + 1 == lenB) return true;
+            for (;pa < lenA; pa++){
+                if (isMatch(a, b, pa, pb + 1)) return true;
+            }
+        }else{
+            if (isMatch(a, b, pa, pb + 1)) return true;
+            for (;pa < lenA; pa++){
+                if (a[pa] == b[pb - 1]){
+                    if (isMatch(a, b, pa + 1, pb + 1)) return true;
+                }
+                else break;
+                }
+            }
+        }
+        
+
+    return false; 
+    }
+};
