@@ -1,0 +1,49 @@
+// ordinary approach could be speeded up by divide and conquer to reduce node traversal
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* merge(ListNode* list1, ListNode* list2){
+        ListNode* root = new ListNode(0, list1);
+        ListNode* looper1{root};
+        ListNode* looper2 = new ListNode(0, list2);
+        while (!(looper1->next == nullptr || looper2->next == nullptr)){
+            if (looper1->next->val < looper2->next->val){
+                looper1 = looper1->next;   
+            }
+            else{
+                ListNode* swapper{looper1->next};
+                looper1->next = looper2->next;
+                looper2->next = looper2->next->next;
+                looper1 = looper1->next;
+                looper1->next = swapper;
+            }
+        }
+        if (looper1->next == nullptr){
+            looper1->next = looper2->next;
+        }
+        return root->next;
+    }
+    
+    ListNode* mergeKLists(vector<ListNode*>& lists) {
+        if (lists.size() == 0) return nullptr;
+        ListNode* ans{lists[0]};
+        int flag{1};
+        for (auto item:lists){
+            if (flag){
+                flag = 0;
+            }
+            else ans = merge(ans, item);
+        }
+        return ans;
+    }
+};
