@@ -1,0 +1,71 @@
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* reverseKGroup(ListNode* head, int k) {
+        if (k < 2){
+            return head;
+        }
+        
+        ListNode* looper{head};
+        ListNode* looper2{head->next};
+        ListNode* looper3{head->next->next};
+ 
+        for (int i{0}; i < k - 1; i++){
+            looper2->next = looper;
+            looper = looper2;
+            looper2 = looper3;
+            if (looper3 != nullptr){
+                looper3 = looper3->next;
+            }
+        }
+        
+        ListNode* root{head};
+        
+        head->next = looper2;
+        head = looper;
+    
+        ListNode* root2{looper2};
+        
+        while (true){
+            ListNode* checker{looper2};
+            for (int i{0}; i < k - 1; i++){
+                if(checker != nullptr){
+                    checker = checker->next;
+                }
+            }
+            if (checker == nullptr){
+                break;
+            }else{
+                looper = looper2;
+                looper2 = looper3;
+                if (looper3 != nullptr){looper3 = looper3->next;}
+                
+                for (int i{0}; i < k - 1; i++){
+                    looper2->next = looper;
+                    looper = looper2;
+                    looper2 = looper3;
+                    if (looper3 != nullptr){
+                        looper3 = looper3->next;
+                    }
+                }
+                root->next = looper;
+                if (looper2 == nullptr){
+                    root2->next = nullptr;
+                }else root2->next = looper2;
+                root = root2;
+                root2 = looper2;   
+            }
+        }
+        
+        return head;
+    }
+};
