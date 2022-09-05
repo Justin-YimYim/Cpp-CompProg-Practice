@@ -1,0 +1,57 @@
+// sliding windows algorithm
+// remember to use break
+
+class Solution {
+public:
+    void slidingWindow(string& s, vector<string>& words, unordered_set<string>& wordsSet, unordered_map<string, int>& wordToCount, vector<int>& ans, int start, int wordLen, int sLen, int windowLen){
+        unordered_map<string, int> track{wordToCount};
+        int end{start};
+        while (end < sLen){
+            if (end - start < windowLen){
+                track[s.substr(end, wordLen)] -= 1;
+                end += wordLen;
+                int flag = 1;
+                for (auto it: track){
+                    if (it.second != 0) {
+                        flag = 0;
+                        break;
+                    }
+                }
+                if (flag == 1) ans.push_back(start);
+            }
+            else{
+                track[s.substr(start, wordLen)] += 1;
+                start += wordLen;
+                track[s.substr(end, wordLen)] -= 1;
+                end += wordLen;
+                int flag = 1;
+                for (auto it: track){
+                    if (it.second != 0) {
+                        flag = 0;
+                        break;
+                    }
+                }
+                if (flag == 1) ans.push_back(start);
+            }
+        }
+    }
+    
+    vector<int> findSubstring(string s, vector<string>& words) {
+        unordered_map<string, int> wordToCount;
+        int wordLen(static_cast<int>(words[0].size()));
+        int sLen(static_cast<int>(s.size()));
+        int windowLen(static_cast<int>(wordLen * words.size()));
+        vector<int> ans;
+        unordered_set<string> wordsSet;
+        for (auto word: words){
+            wordToCount[word] += 1;
+            wordsSet.insert(word);
+        }
+        for (int i{0}; i < wordLen; i++){
+            slidingWindow(s, words, wordsSet, wordToCount, ans, i, wordLen, sLen, windowLen);
+        }
+        
+        sort(ans.begin(), ans.end());
+        return ans;
+    }
+};
