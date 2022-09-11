@@ -1,4 +1,5 @@
 // Aware INT_MAX, INT_MIN and always use long in the middle of calculation
+// labs() is your good friend to transfer int to long absolute value
 
 class Solution {
 public:
