@@ -2,6 +2,10 @@
 // Construction for Caching is slower than brute force looping in this case
 // Map => for search
 // Priority Queue for min/max
+// Pair => make_pair(a, b)
+// iterator looping and a->first.first a->first.second b->second
+// bit manipulation: & ~(1 << num) => reduce num-th bit
+//                   x & -x => rightmost bit
 
 typedef pair<int, int> pos;
 
