@@ -1,3 +1,6 @@
+// string += char is fine
+// vector.clear()
+
 class Solution {
 public:
     string countAndSay(int n) {
