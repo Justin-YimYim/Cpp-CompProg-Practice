@@ -1,0 +1,30 @@
+class Solution {
+public:
+    string countAndSay(int n) {
+        vector<int> counter;
+        vector<char> number;
+        string ans{"1"};
+        for (int i{1}; i < n; i++){
+            for (auto s: ans){
+                if (number.empty()){
+                    counter.push_back(1);
+                    number.push_back(s);
+                }else if(s != number[number.size() - 1]){
+                    counter.push_back(1);
+                    number.push_back(s);
+                }else{
+                    counter[counter.size() - 1] += 1;
+                }
+            }
+            string newAns;
+            for (int k{0}; k < counter.size(); k++){
+                newAns += (counter[k] + '0');
+                newAns += (number[k]);
+            }
+            ans = newAns;
+            counter.clear();
+            number.clear();
+        }
+        return ans;
+    }
+};
