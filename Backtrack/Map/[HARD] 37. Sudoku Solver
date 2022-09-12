@@ -1,0 +1,110 @@
+// RMB to recover all the data in recursion/ backtracking. 
+// Map => for search
+// Priority Queue for min/max
+
+typedef pair<int, int> pos;
+
+class Solution {
+public:
+    void initPriorityBoard(vector<vector<char>>& board, map<pair<int, int>, int>& initBoard){
+        for (int i{0}; i < 9; i++){
+            for (int j{0}; j < 9; j++){
+                pos Pos{i, j};
+                initBoard[Pos] = (1 << 9) - 1;
+            }
+        }
+        
+        for (int i{0}; i < 9; i++){
+            for (int j{0}; j < 9; j++){
+                if (board[i][j] != '.'){
+                    pos Pos{i, j};
+                    initBoard[Pos] = 1 << 9;
+                    int num{board[i][j] - '1'};
+                    for (int k{0}; k < 9; k++){
+                        pos Pos2{k, j};
+                        pos Pos3{i, k};
+                        if (Pos != Pos2 && initBoard[Pos2] != 1 << 9){
+                            initBoard[Pos2] &=  ~(1 << num);
+                        }
+                        if (Pos != Pos3 && initBoard[Pos3] != 1 << 9){
+                            initBoard[Pos3] &= ~(1 << num);
+                        }
+                    }
+                    int row = i - i % 3;
+                    int col = j - j % 3;
+                    for (int h{0}; h < 3; h++){
+                        for (int k{0}; k < 3; k++){
+                            pos Pos4{row + h, col + k};
+                            if (Pos.first != Pos4.first && Pos.second != Pos4.second  && initBoard[Pos4] != 1 << 9){
+                                initBoard[Pos4] &= ~(1 << num);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    bool fillBoard(vector<vector<char>>& board, map<pair<int, int>, int> initBoard){
+        pair<int, int> currentPos{0, 0};
+        int count{initBoard[make_pair(0, 0)]};
+        for (int i{0}; i < 9; i++){
+            for (int j{0}; j < 9; j++){
+                if (initBoard[make_pair(i, j)] < count){
+                    currentPos = make_pair(i, j);
+                    count = initBoard[make_pair(i, j)];
+                }
+            }
+        }
+        
+        if (count >= 1 << 9){
+            return true;
+        }
+        
+        if (count == 0){
+            return false;
+        }
+        
+        while (count != 0){
+            int number{count & -count};
+            count -= number;
+            number = static_cast<int>(log2(number));
+
+            board[currentPos.first][currentPos.second] = number + '1';
+            initBoard[currentPos] =  1 << 9;
+            map<pair<int, int>, int> tmpBoard{initBoard};
+
+            for (int k{0}; k < 9; k++){
+                pos Pos2{k, currentPos.second};
+                pos Pos3{currentPos.first, k};
+                if (currentPos != Pos2 && initBoard[Pos2] != 1 << 9){
+                    initBoard[Pos2] &=  ~(1 << number);
+                }
+                if (currentPos != Pos3 && initBoard[Pos3] != 1 << 9){
+                    initBoard[Pos3] &= ~(1 << number);
+                }
+            }
+            int row = currentPos.first - currentPos.first % 3;
+            int col = currentPos.second - currentPos.second % 3;
+            for (int h{0}; h < 3; h++){
+                for (int k{0}; k < 3; k++){
+                    pos Pos4{row + h, col + k};
+                    if (currentPos.first != Pos4.first && currentPos.second != Pos4.second  && initBoard[Pos4] != 1 << 9){
+                        initBoard[Pos4] &= ~(1 << number);
+                    }
+                }
+            }
+            
+            if (fillBoard(board, initBoard)) return true;
+            initBoard = tmpBoard;
+            initBoard[currentPos] = count;
+        }
+        return false;
+    }
+
+    void solveSudoku(vector<vector<char>>& board) {
+        map<pos, int> initBoard;
+        initPriorityBoard(board, initBoard);
+        fillBoard(board, initBoard);
+    }
+};
