@@ -1,0 +1,25 @@
+// How to find positive number in o(n) time? => only use scaning 
+// How to keep track on exist number? => turn into negative n using INT_MAX
+// Position in the array is a resource to know which items is appeared if we could provide some signal
+
+class Solution {
+public:
+    int firstMissingPositive(vector<int>& nums) {
+        int n = nums.size();
+        for (int i{0}; i < n; i++) if (nums[i] < 1) nums[i] = INT_MAX;
+        for (int i{0}; i < n; i++) {
+            if (nums[i] != INT_MAX && nums[i] != INT_MIN && nums[i] != 0){
+                if (abs(nums[i]) <= n){
+                    if (nums[abs(nums[i]) - 1] == INT_MAX || nums[abs(nums[i]) - 1] == INT_MIN) nums[abs(nums[i]) - 1] = INT_MIN;
+                    else if (nums[abs(nums[i]) - 1] > 0) nums[abs(nums[i]) - 1] *= -1;
+                }
+            }
+        } 
+        for (int i{0}; i < n; i++) {
+            if (nums[i] > 0) {
+                return i + 1;
+            }
+        }
+        return n + 1;
+    }
+};
