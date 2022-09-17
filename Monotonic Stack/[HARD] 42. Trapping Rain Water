@@ -1,0 +1,50 @@
+// 1. Out of boundary => remember pop_back call in the last of the function/ Otherwise very easy heap-buffer-overflow error
+// VERYVERY IMPORTANT
+// 2. Write Sudo code first for new type of questions 
+//        A. Write down how many branches
+//        B. Each variable how to transfer state
+
+class Solution {
+public:
+    int trap(vector<int>& height) {
+        vector<int> monoQueue1;
+        // pair<posInQueue, len>
+        vector<pair<int, int>> filledStack;
+        int count{0};
+        
+        for (int i{0}; i < height.size(); i++){
+            if (monoQueue1.empty() || monoQueue1.back() > height[i]){
+                monoQueue1.push_back(height[i]);
+            }
+            
+            else{
+                // pair<height, length>
+                pair<int, int> traceBack{0, 0};
+                int flag{0};
+                while (!monoQueue1.empty() && monoQueue1.back() <= height[i]){
+                    count += (traceBack.second == 0) ? 0: (monoQueue1.back() * traceBack.second - traceBack.first * traceBack.second);
+                    traceBack.first = monoQueue1.back();
+                    if (filledStack.empty()){
+                        traceBack.second++;
+                    }
+                    else{
+                        traceBack.second = monoQueue1.back() == filledStack.back().first? traceBack.second + filledStack.back().second: ++traceBack.second;
+                        if (monoQueue1.back() == filledStack.back().first) filledStack.pop_back();
+                    }
+                    monoQueue1.pop_back();
+                }
+                if (monoQueue1.empty()){
+                    filledStack.clear();
+                }
+                else{
+                    count += (traceBack.second == 0) ? 0: (height[i] * traceBack.second - traceBack.first * traceBack.second);
+                    traceBack.first = height[i];
+                    traceBack.second++;
+                    filledStack.push_back(traceBack);
+                }
+                monoQueue1.push_back(height[i]);
+            }
+        }
+        return count;
+    }
+};
