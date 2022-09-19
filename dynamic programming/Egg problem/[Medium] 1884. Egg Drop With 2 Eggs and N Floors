@@ -1,0 +1,13 @@
+class Solution {
+public:
+    int twoEggDrop(int n) {
+        int count{1};
+        int sum{1};
+        
+        while (sum < n){
+            count++;
+            sum += count;
+        }
+        return count;
+    }
+};
