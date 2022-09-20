@@ -1,0 +1,69 @@
+// write all variable at the beginning
+// break at the beginning
+// increment/ decrement value at the end
+
+class Solution {
+public:
+    string minWindow(string s, string t) {
+        int ptr{0};
+        int ptr2{0};
+        int m = s.size();
+        int n = t.size();
+        pair<int, int> ans{0, m};
+        if (m < n) return "";
+        unordered_map<char, int> hmap;
+        
+        for (int i{0}; i < n; i++){
+            hmap[t[i]] += 1;
+        }
+        while(true){
+            if (ptr2 == n) break;
+            if (hmap.find(s[ptr2]) != hmap.end()) hmap[s[ptr2]] -= 1;
+            bool flag{true};
+            for (auto &it: hmap){
+                if (it.second > 0){
+                    flag = false;
+                }
+            }
+            if (flag) return s.substr(ptr, ptr2 - ptr + 1);
+            ptr2++;
+        }
+
+        while (true){
+            if (ptr2 == m){
+                break;
+            }
+            if (hmap.find(s[ptr2]) != hmap.end()) hmap[s[ptr2]] -= 1;
+            bool flag{true};
+            for (auto &it: hmap){
+                if (it.second > 0){
+                    flag = false;
+                }
+            }
+
+            if (flag){
+                if (ans.second - ans.first > ptr2 - ptr){
+                    ans = make_pair(ptr, ptr2);
+                }
+                while (true){
+                    if (hmap.find(s[ptr]) != hmap.end()) hmap[s[ptr]] += 1;
+                    ptr++;
+                    bool flag2{true};
+                    for (auto &it: hmap){
+                        if (it.second > 0){
+                            flag2 = false;
+                        }
+                    }
+                    if (flag2){
+                        if (ans.second - ans.first > ptr2 - ptr){
+                            ans = make_pair(ptr, ptr2);
+                        }
+                    }else break;
+                }
+            }
+            ptr2++;
+        }
+        if (ans.second == m) return "";
+        return s.substr(ans.first, ans.second - ans.first + 1);
+    }
+};
