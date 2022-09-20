@@ -1,0 +1,69 @@
+class Solution {
+public:
+    int largestRectangleArea(vector<int>& heights) {
+        int max{0};
+        int length = heights.size();
+        vector<int> pos;
+        vector<int> storage(length, 0);
+        if (length == 1) return heights[0];
+        
+        for (int i{0}; i < length; i++){
+            if (pos.empty()){
+                pos.push_back(i);
+            }
+            else{
+                if (heights[pos.back()] <= heights[i]){
+                    pos.push_back(i);
+                }
+                else{
+                    while(!pos.empty() && heights[pos.back()] > heights[i]){
+                        int tmp{(i - pos.back()) * heights[pos.back()]};
+                        storage[pos.back()] = tmp;
+                        pos.pop_back();
+                    }
+                    pos.push_back(i);
+                }
+            }
+        }
+        
+
+        while (!pos.empty()){
+            int tmp{(length - pos.back()) * heights[pos.back()]};
+            storage[pos.back()] = tmp;
+            pos.pop_back();
+        }
+        
+        for (int i{length - 1}; i >= 0; i--){
+            if (pos.empty()){
+                pos.push_back(i);
+            }
+            else{
+                if (heights[pos.back()] <= heights[i]){
+                    pos.push_back(i);
+                }
+                else{
+                    while(!pos.empty() && heights[pos.back()] > heights[i]){
+                        int tmp{(abs(i - pos.back()) - 1) * heights[pos.back()]};
+                        storage[pos.back()] += tmp;
+                        if (storage[pos.back()] > max){
+                            max = storage[pos.back()];
+                        }
+                        pos.pop_back();
+                    }
+                    pos.push_back(i);
+                }
+            }
+        }
+        
+        while (!pos.empty()){
+            int tmp{abs(pos.back()) * heights[pos.back()]};
+            storage[pos.back()] += tmp;
+            if (storage[pos.back()] > max){
+                max = storage[pos.back()];
+            }
+            pos.pop_back();
+        }
+        
+        return max;        
+    }
+};
