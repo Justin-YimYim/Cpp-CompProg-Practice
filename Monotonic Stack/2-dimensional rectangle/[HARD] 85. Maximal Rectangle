@@ -1,0 +1,58 @@
+// Remember monotonic stack will always stores and updates zero position
+// check whether input is char or int
+// 
+
+class Solution {
+public:
+    int maximalRectangle(vector<vector<char>>& matrix) {
+        int ans{0};
+        int rows = matrix.size();
+        int cols = matrix[0].size();
+        int dp[rows][cols];
+        
+        for (int i{0}; i < rows; i++){
+            dp[i][0] = matrix[i][0] - '0';
+            for (int j{1}; j < cols; j++){
+                if (matrix[i][j] == '1') dp[i][j] = dp[i][j- 1] + 1;
+                else dp[i][j] = 0;
+                if (dp[i][j] > ans) ans = dp[i][j];
+            }
+        }
+
+        for (int j{0}; j < cols; j++){
+            vector<int> monotonic{0};
+            for (int i{1}; i < rows; i++){
+                if (dp[i][j] > dp[monotonic.back()][j]){
+                    monotonic.push_back(i);
+                }else{
+                    while (!monotonic.empty() && dp[i][j] < dp[monotonic.back()][j]){
+                        if (monotonic.size() > 1){
+                            int current{monotonic.back()};
+                            monotonic.pop_back();
+                            int tmp{dp[current][j] * (i - monotonic.back() - 1)};
+                            if (tmp > ans) ans = tmp;
+                        }else{
+                            int tmp{dp[monotonic.back()][j] * (i)};
+                            if (tmp > ans) ans = tmp;
+                            monotonic.pop_back();
+                        }
+                    }
+                    monotonic.push_back(i);
+                }
+            }
+            while(!monotonic.empty()){
+                if (monotonic.size() > 1){
+                    int current{monotonic.back()};
+                    monotonic.pop_back();
+                    int tmp{dp[current][j] * (rows - monotonic.back() - 1)};
+                    if (tmp > ans) ans = tmp;
+                }else{
+                    int tmp{dp[monotonic.back()][j] * (rows)};
+                    if (tmp > ans) ans = tmp;
+                    monotonic.pop_back();
+                }
+            }
+        }
+        return ans;
+    }
+};
