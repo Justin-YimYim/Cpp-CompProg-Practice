@@ -1,4 +1,4 @@
-// Two containers approach O(log(mix a, b))
+// Two containers approach O(log(max a, b))
 // Find medina => no need concern how the sort only need to make into two containers then find max and min of the two contianers
 
 // Learning from this code: 
