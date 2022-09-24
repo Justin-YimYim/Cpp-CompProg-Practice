@@ -1,0 +1,46 @@
+/ 1. How to split (locate the target)
+-> Monotonic increasing
+---> In target left, high >= mid
+---> In target right, high <= mid
+====> Problem mid == high (only one changing point)
+======> loop through all same value => find the changing point
+
+/ 2. Reminder
+-> return at last 
+-> think about high = mid or high = mid++; (whether using < or <=)
+-> think in small test case
+
+
+class Solution {
+public:
+    int findMin(vector<int>& nums) {
+        int low{0};
+        int high = nums.size() - 1;
+        int mid{(low + high) / 2};
+        
+        while (low < high){
+            mid = (low + high) / 2;
+            if (nums[high] > nums[mid]) high = mid;
+            else if(nums[high] == nums[mid]){
+                bool flag{true};
+                for (int i{1}; i <= (mid - low); i++){
+                    if (nums[mid - i] < nums[high]) {
+                        high = mid - i;
+                        flag = false;
+                        break;
+                    }
+                    if (nums[mid + i] != nums[high]) {
+                        low = mid + i;
+                        flag = false;
+                        break;
+                    }
+                }
+                if (flag){
+                    return nums[high];
+                }
+            }
+            else low = mid + 1;
+        }
+        return nums[low];
+    }
+};
