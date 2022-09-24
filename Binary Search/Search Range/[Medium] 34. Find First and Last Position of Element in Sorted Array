@@ -1,0 +1,40 @@
+class Solution {
+public:
+    int binarySearch(vector<int> &nums, int target, int low, int high){
+        int mid = (low + high) / 2;
+        if (nums[mid] == target) return mid;
+        if (low >= high) return -1;
+        
+        if (nums[mid] > target) return binarySearch(nums, target, low, mid - 1);
+        else return binarySearch(nums, target, mid + 1, high);
+    }
+    
+    int binarySearchLeft(vector<int> &nums, int target, int low, int high){
+        int mid = (low + high) / 2;
+        if (low > high) return low;
+        
+        if (nums[mid] >= target) return binarySearchLeft(nums, target, low, mid - 1);
+        else return binarySearchLeft(nums, target, mid + 1, high);
+    }
+    int binarySearchRight(vector<int> &nums, int target, int low, int high){
+        int mid = (low + high) / 2;
+        if (low > high) return high;
+        
+        if (nums[mid] <= target) return binarySearchRight(nums, target, mid + 1, high);
+        else return binarySearchRight(nums, target, low, mid - 1);
+    }
+    
+    vector<int> searchRange(vector<int>& nums, int target) {
+        if (nums.size() == 0){
+            vector<int> ans{-1, -1};
+            return ans;
+        }
+        int mid{binarySearch(nums, target, 0, nums.size() - 1)};
+        if (mid == -1){
+            vector<int> ans{-1, -1};
+            return ans;
+        }
+        vector<int> ans{binarySearchLeft(nums, target, 0, mid), binarySearchRight(nums, target, mid, nums.size() - 1)};
+        return ans;
+    }
+};
