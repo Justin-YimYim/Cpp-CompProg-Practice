@@ -1,0 +1,91 @@
+// Quick Sort seems to much time consuming if the things is sorted
+
+class Solution {
+public:
+    int partition(vector<vector<int>>& envelopes, int l, int r){
+        int pivot{envelopes[r][2]};
+        int i{l - 1};
+        for (int j{l}; j < r; j++){
+            if (envelopes[j][2] < pivot){
+                i++;
+                vector<int> tmp{envelopes[i]};
+                envelopes[i] = envelopes[j];
+                envelopes[j] = tmp;
+            }
+        }
+        vector<int> tmp{envelopes[i + 1]};
+        envelopes[i + 1] = envelopes[r];
+        envelopes[r] = tmp;
+        return i+ 1;
+    }
+    
+    void quick_sort(vector<vector<int>>& envelopes, int l, int r){
+        if (l < r){
+            int x{partition(envelopes, l ,r)};
+            quick_sort(envelopes, l, x - 1);
+            quick_sort(envelopes, x + 1, r);
+        }
+    }
+    
+    int maxEnvelopes(vector<vector<int>>& envelopes) {
+        int m = envelopes.size();
+        vector<vector<int>> stackAns{};
+        vector<vector<int>> stackTmp{};
+        
+        for (int i{0}; i < m; i++){
+            int area{envelopes[i][0] * envelopes[i][1]};
+            envelopes[i].push_back(area);
+        }
+        
+        quick_sort(envelopes, 0, m - 1);
+        envelopes[0].push_back(1);
+        stackAns.push_back(envelopes[0]);
+        
+        for (int i{1}; i < m; i++){
+            vector<int> current;
+            
+            while (true){
+                if (stackAns.empty()){
+                    envelopes[i].push_back(1);
+                    current = envelopes[i];
+                    break;
+                }
+                if (envelopes[i][0] > stackAns.back()[0] && envelopes[i][1] > stackAns.back()[1]){
+                    envelopes[i].push_back(stackAns.back()[3] + 1);
+                    current = envelopes[i];
+                    break;
+                }else{
+                    stackTmp.push_back(stackAns.back());
+                    stackAns.pop_back();
+                }
+            }
+            
+            if (stackAns.empty()){
+                stackAns.push_back(current);
+                while (!stackTmp.empty()){
+                    stackAns.push_back(stackTmp.back());
+                    stackTmp.pop_back();
+                }
+            }
+            else{
+                if (stackTmp.empty()){
+                    stackAns.push_back(current);
+                }
+                else{
+                    while (current[3] >= stackTmp.back()[3]){
+                        stackAns.push_back(stackTmp.back());
+                        stackTmp.pop_back();
+                        if (stackTmp.empty()) break;
+                        }
+                        stackAns.push_back(current);
+                    while (!stackTmp.empty()){
+                        stackAns.push_back(stackTmp.back());
+                        stackTmp.pop_back();
+                    }
+                }
+            }
+        }
+        
+        return stackAns.back()[3];
+    }
+};
