@@ -1,6 +1,6 @@
 # Quick Sort & DP & stack to solve the problem
 
-### First Quick Sort 
+### First Quick Sort (Might need to use randomized Quick Sort to speed up)
 To sort the envelops using area => so we could use dp to look back state
 
 ### Then DP
