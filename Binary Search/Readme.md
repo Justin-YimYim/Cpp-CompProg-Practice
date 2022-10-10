@@ -11,14 +11,14 @@ Search(array, target, low, high)
 A part consist from monotonic structure could use Binary Search to search some value
 
 # iterative methods 
-Search(arr, target):
-left = 0 
-right = size() - 1
-while (left <= right):
-  mid = (left + right) >> 1;
-  if inside left:
-    right = mid - 1;
-  else if inside right:
-    left = mid + 1;
-  else found/ not found:
-    return mid;
+Search(arr, target):\
+left = 0 \
+right = size() - 1\
+while (left <= right):\
+  mid = (left + right) >> 1;\
+  if inside left:\
+    right = mid - 1;\
+  else if inside right:\
+    left = mid + 1;\
+  else found/ not found:\
+    return mid;\
