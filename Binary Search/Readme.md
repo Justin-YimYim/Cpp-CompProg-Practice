@@ -15,10 +15,10 @@ Search(arr, target):\
 left = 0 \
 right = size() - 1\
 while (left <= right):\
-  mid = (left + right) >> 1;\
-  if inside left:\
-    right = mid - 1;\
-  else if inside right:\
-    left = mid + 1;\
-  else found/ not found:\
-    return mid;\
+  &nbsp;mid = (left + right) >> 1;\
+  &nbsp;if inside left:\
+    &nbsp;&nbsp;right = mid - 1;\
+  &nbsp;else if inside right:\
+    &nbsp;&nbsp;left = mid + 1;\
+  &nbsp;else found/ not found:\
+    &nbsp;&nbsp;return mid;\
