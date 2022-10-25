@@ -1,0 +1,86 @@
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Codec {
+public:
+
+    // Encodes a tree to a single string.
+    string serialize(TreeNode* root) {
+        if (root == NULL){
+            return "#";
+        }
+        string ans;
+        vector<TreeNode*> queue;
+        ans = ans + '_' + to_string(root->val);
+        queue.push_back(root->left);
+        queue.push_back(root->right);
+        while (!queue.empty()){
+            root = queue.front();
+            if (root != NULL){
+                ans = ans + '_' + to_string(root->val);
+                queue.push_back(root->left);
+                queue.push_back(root->right);
+            }else{
+                ans += "#";
+            }
+            queue.erase(queue.begin());
+        }
+        return ans;
+    }
+
+    // Decodes your encoded data to tree.
+    TreeNode* deserialize(string data) {
+        TreeNode* ans = new TreeNode();
+        vector<TreeNode*> queue{ans};
+        if (data[0] == '#'){
+            return nullptr;
+        }else{
+            int lptr{1};
+            int rptr{2};
+            while (data[rptr] != '#' && data[rptr] != '_'){
+                rptr++;
+            }
+            ans->val = stoi(data.substr(lptr, rptr - lptr));
+            while (rptr < data.size()){
+                if (data[rptr] == '#'){
+                    lptr = rptr;
+                    rptr ++;
+                }else{
+                    lptr = rptr + 1;
+                    rptr = rptr + 2;
+                    while (data[rptr] != '#' && data[rptr] != '_'){
+                        rptr++;
+                    }
+                    TreeNode* iter = queue.front();
+                    iter->left = new TreeNode(stoi(data.substr(lptr, rptr - lptr)));
+                    queue.push_back(iter->left);
+                }
+                if (data[rptr] == '#'){
+                    lptr = rptr;
+                    rptr++;
+                }else{
+                    lptr = rptr + 1;
+                    rptr = rptr + 2;
+                    while (data[rptr] != '#' && data[rptr] != '_'){
+                        rptr++;
+                    }
+                    TreeNode* iter = queue.front();
+                    iter->right = new TreeNode(stoi(data.substr(lptr, rptr - lptr)));
+                    queue.push_back(iter->right);
+                }
+                queue.erase(queue.begin());
+            }
+        }
+        return ans;
+    }
+};
+
+// Your Codec object will be instantiated and called as such:
+// Codec ser, deser;
+// TreeNode* ans = deser.deserialize(ser.serialize(root));
