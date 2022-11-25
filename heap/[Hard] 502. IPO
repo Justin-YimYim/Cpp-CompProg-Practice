@@ -1,0 +1,30 @@
+class Solution {
+public:
+    int findMaximizedCapital(int k, int w, vector<int>& profits, vector<int>& capital) {
+        multimap<int, int, greater<int>> capital_to_profit;
+        multiset<int> profits_2;   
+        if (profits.size() == 0){
+            return w;
+        }
+        for (int i = 0; i < profits.size(); i++){
+            capital_to_profit.insert({capital[i], profits[i]});
+        }
+        for (;k > 0; k--){
+            while (capital_to_profit.size() > 0){
+                auto it = capital_to_profit.lower_bound(w);
+                if (it == capital_to_profit.end())break;
+                else{
+                    profits_2.insert({it->second});
+                    capital_to_profit.erase(it);
+                }
+            }
+            if (profits_2.size() == 0){
+                break;
+            }
+            w += *(profits_2.rbegin());
+            profits_2.erase(prev(profits_2.end()));
+        }
+        
+        return w;
+    }
+};
