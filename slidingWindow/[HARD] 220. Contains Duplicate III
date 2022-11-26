@@ -1,0 +1,53 @@
+// Two pointers + multiset 
+
+class Solution {
+public:
+    bool containsNearbyAlmostDuplicate(vector<int>& nums, int indexDiff, int valueDiff) {
+        multiset<int> numbers;
+        multiset<int, greater<int>> numbers_2;
+        int ptr1{0};
+        int ptr2{1};
+        while(ptr1 != ptr2){
+            if (ptr2 - ptr1 <= indexDiff && ptr2 < nums.size()){
+                numbers.insert(nums[ptr2]);                
+                numbers_2.insert(nums[ptr2]);
+                ptr2 += 1;
+            }else if(ptr2 < nums.size()){
+                ptr1 += 1;
+                auto x = numbers.find(nums[ptr1]);
+                auto y = numbers_2.find(nums[ptr1]);
+                numbers.erase(x);
+                numbers.insert(nums[ptr2]);
+                numbers_2.erase(y);
+                numbers_2.insert(nums[ptr2]);
+                ptr2 += 1;
+            }else{
+                ptr1 += 1;
+                auto x = numbers.find(nums[ptr1]);
+                auto y = numbers_2.find(nums[ptr1]);
+                numbers.erase(x);
+                numbers_2.erase(y);
+            }
+            
+            if (numbers.size() == 0){
+                return false;
+            }
+            
+            auto it = numbers.lower_bound(nums[ptr1]);
+            auto it_2 = numbers_2.lower_bound(nums[ptr1]);
+            
+            if (it != numbers.end()){
+                if (abs(*it - nums[ptr1]) <= valueDiff ){
+                    return true;
+                }
+            }
+            
+            if (it_2 != numbers_2.end()){
+                if (abs(*it_2 - nums[ptr1]) <= valueDiff ){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+};
