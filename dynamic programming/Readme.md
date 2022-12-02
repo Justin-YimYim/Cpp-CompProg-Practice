@@ -6,3 +6,6 @@
 ### Backward vs Forward
 - Forward means condition depends on past
 - Backward means condition depends on future
+### cherry pick 4 stage
+** for loop is hard to do pruning
+** while loop is easier
