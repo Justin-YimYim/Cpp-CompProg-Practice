@@ -1,0 +1,95 @@
+class Solution {
+public:
+    int cherryPickup(vector<vector<int>>& grid) {
+        int dp[grid.size() + 1][grid.size() + 1][grid.size() + 1];
+        int step(2 * grid.size() + 2);
+        memset(dp, -1, sizeof(dp));
+        dp[0][0][0] = -1;
+        
+        for (int i = 0; i < grid.size() + 1; i++){
+            for (int j = 0; j < grid.size() + 1; j++){
+                dp[i][j][0] = -1;
+                dp[i][0][j] = -1;
+                dp[0][i][j] = -1;
+            }
+        }
+        dp[1][1][1] = 0;
+        
+        for (int i = 2; i < step; i++){
+            if (i <= grid.size() + 1){
+                for (int j = 1; j < i; j++){
+                    for (int k = 1; k < i; k++){
+                        if (grid[j - 1][i - j - 1] == -1 || grid[k - 1][i - k - 1] == -1){
+                            dp[j][i - j][k] = -1;
+                            continue;
+                        }
+                        
+                        int lastj1 = max(dp[j - 1][i - j][k - 1], dp[j - 1][i - j][k]);
+                        int lastj2 = max(dp[j][i - j - 1][k - 1], dp[j][i - j - 1][k]);
+                        int lastk1 = max(dp[j - 1][i - j][k - 1], dp[j][i - j - 1][k - 1]);
+                        int lastk2 = max(dp[j - 1][i - j][k], dp[j][i - j - 1][k]);
+                        
+                        dp[j][i - j][k] = max(max(max(max(lastj1, lastj2), lastk1), lastk2), dp[j][i - j][k]);
+                        if (dp[j][i - j][k] != -1){
+                            if (j == k){
+                                if (grid[j - 1][i - j - 1] == 1){
+                                    dp[j][i - j][k] += 1;
+                                }
+                            }else{
+                                if (grid[j - 1][i - j - 1] == 1 && grid[k - 1][i - k - 1] == 1){
+                                    dp[j][i - j][k] += 2;
+                                }else if (grid[j - 1][i - j - 1] == 0 && grid[k - 1][i - k - 1] == 0){
+                                    ;
+                                }else{
+                                    dp[j][i - j][k] += 1; 
+                                }
+                            }
+                        }
+                    }
+                }
+            }else{
+                for (int j = i - grid.size(); j <= grid.size(); j++){
+                    for (int k = i - grid.size(); k <= grid.size(); k++){
+                        if (grid[j - 1][i - j - 1] == -1 || grid[k - 1][i - k - 1] == -1){
+                            dp[j][i - j][k] = -1;
+                            continue;
+                        }
+                        
+                        int lastj1 = max(dp[j - 1][i - j][k - 1], dp[j - 1][i - j][k]);
+                        int lastj2 = max(dp[j][i - j - 1][k - 1], dp[j][i - j - 1][k]);
+                        int lastk1 = max(dp[j - 1][i - j][k - 1], dp[j][i - j - 1][k - 1]);
+                        int lastk2 = max(dp[j - 1][i - j][k], dp[j][i - j - 1][k]);
+                        dp[j][i - j][k] = max(max(max(lastj1, lastj2), lastk1), lastk2);
+                        if (dp[j][i - j][k] != -1){
+                            if (j == k){
+                                if (grid[j - 1][i - j - 1] == 1){
+                                    dp[j][i - j][k] += 1;
+                                }
+                            }else{
+                                if (grid[j - 1][i - j - 1] == 1 && grid[k - 1][i - k - 1] == 1){
+                                    dp[j][i - j][k] += 2;
+                                }else if (grid[j - 1][i - j - 1] == 0 && grid[k - 1][i - k - 1] == 0){
+                                    ;
+                                }else{
+                                    dp[j][i - j][k] += 1; 
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        for (auto &a: dp){
+            for (auto &b: a){
+                for (auto c: b){
+                    cout << c << " ";
+                }
+                cout <<endl;
+            }
+            cout << endl;
+        }
+        
+        return max(dp[grid.size()][grid[0].size()][grid.size()], 0);
+    }
+};
