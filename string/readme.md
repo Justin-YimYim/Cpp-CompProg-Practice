@@ -2,7 +2,7 @@
 - skipping mismatch
 # Boyer–Moore string-search algorithm
 - skipping mismatch
-# Rabin-Karp Algorithm
+# Rabin-Karp Algorithm (Checking same substr)
 - Based Rolling hash
 - Expected = O(n); worst = O(n^2)
 - 1. By computing the hash value
