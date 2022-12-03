@@ -1,0 +1,40 @@
+class Solution {
+public:
+    int cherryPickup(vector<vector<int>>& grid) {
+        int dp[grid.size() + 1][grid[0].size() + 2][grid[0].size() + 2];
+        memset(dp, -1, sizeof(dp));
+        
+        int ptr1(1), ptr2(grid[0].size() - 2), row(0);
+        while (ptr1 <= ptr2){
+            for (int i = ptr1; i <= ptr2; i++){
+                grid[row][i] = 0;
+            }
+            ptr1++;
+            ptr2--;
+            row++;
+        }
+        dp[1][1][grid[0].size()] = grid[0][0] + grid[0][grid[0].size() - 1];
+        for (int i = 1; i <= grid.size(); i++){
+            for (int k = 1; k < grid[0].size() + 1; k++){
+                for (int j = 1; j < grid[0].size() + 1; j++){
+                    dp[i][k][j] = max(max(max(max(max(max(max(max(max(dp[i - 1][k - 1][j - 1], dp[i - 1][k - 1][j]), dp[i - 1][k - 1][j + 1]), dp[i - 1][k][j - 1]), dp[i - 1][k][j]), dp[i - 1][k][j + 1]), dp[i - 1][k + 1][j - 1]), dp[i - 1][k + 1][j]), dp[i - 1][k + 1][j + 1]), dp[i][k][j]);
+                    if (dp[i][k][j] != -1){
+                        if (k == j){
+                            dp[i][k][j] += grid[i - 1][k - 1];
+                        }else{
+                            dp[i][k][j] += grid[i - 1][k - 1] + grid[i - 1][j - 1];
+                        }  
+                    }
+                }
+            }
+        }
+
+        int ans(0);
+        for (int k = 1; k < grid[0].size() + 1; k++){
+            for (int j = 1; j < grid[0].size() + 1; j++){
+                if (dp[grid.size()][k][j] > ans) ans = dp[grid.size()][k][j];
+            }
+        }
+        return ans - (grid[0][0] + grid[0][grid[0].size() - 1]);
+    }
+};
