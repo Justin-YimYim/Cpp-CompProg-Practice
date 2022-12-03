@@ -1,0 +1,22 @@
+class Solution {
+public:
+    int longestDecomposition(string text) {
+        int ptr1(0), ptr2(text.size() - 1);
+        int ans(0);
+        while(ptr1 < ptr2){
+            if (text.substr(0, ptr1 + 1) == text.substr(ptr2, text.size() - ptr2)){
+                ans += 2;
+                text = text.substr(ptr1 + 1, ptr2 - ptr1 - 1);
+                ptr1 = 0;
+                ptr2 = text.size() - 1;
+            }else{
+                ptr1 += 1;
+                ptr2 -= 1;
+            }
+        }
+        if (text.size() >= 1){
+            ans += 1;
+        }
+        return ans;
+    }
+};
