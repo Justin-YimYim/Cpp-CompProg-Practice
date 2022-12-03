@@ -1,5 +1,5 @@
 # KMP Algorithm
-= skipping mismatch
+- skipping mismatch
 # Boyer–Moore string-search algorithm
 - skipping mismatch
 # Rabin-Karp Algorithm
