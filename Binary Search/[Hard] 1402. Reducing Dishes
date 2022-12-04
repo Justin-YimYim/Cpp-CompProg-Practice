@@ -1,0 +1,32 @@
+class Solution {
+public:
+    int maxSatisfaction(vector<int>& satisfaction) {
+        sort(satisfaction.begin(), satisfaction.end());
+        auto tmp_ptr = lower_bound(satisfaction.begin(), satisfaction.end(), 0);
+        if (tmp_ptr == satisfaction.end()) return 0;
+        int sum(0);
+        for (auto it = tmp_ptr; it != satisfaction.end(); ++it){
+            sum += *it;
+        }
+        sum -= *tmp_ptr;
+        for (auto it = tmp_ptr; it != satisfaction.begin(); --it){
+            sum += *it;
+            if (sum <= 0){
+                tmp_ptr = ++it;
+                break;
+            }
+        }
+        if (sum > 0 && sum + *(satisfaction.begin()) > 0){
+            tmp_ptr = satisfaction.begin();
+        }else if (sum > 0){
+            tmp_ptr = satisfaction.begin() + 1;
+        }
+
+        int ans(0);
+        for (int i = 1; tmp_ptr != satisfaction.end(); ++tmp_ptr){
+            ans += i * (*tmp_ptr);
+            i++;
+        }
+        return ans;
+    }
+};
