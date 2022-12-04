@@ -1,0 +1,9 @@
+class Solution {
+public:
+    int arrangeCoins(int n) {
+        // Find n - x^2 / 2 < x
+        long k = n;
+        double ans1 = (-2 + sqrt(4 + 8 * k)) / 2;
+        return (ans1 + 0.5);
+    }
+};
