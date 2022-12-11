@@ -1,0 +1,68 @@
+class Solution {
+public:
+    unordered_map<char, vector<int>> s2Map;
+
+    int getSmallestBit(int const &a){
+        int b = a & ~ ( a - 1);
+        int lowest(-1);
+        while (b != 0){
+            b >>= 1;
+            lowest++;
+        }
+        return lowest;
+    }
+
+    set<int> BFS(long const & bit, string const &s1, string const &s2, queue<int>& lowest, queue<set<int>>& q){
+        queue<set<int>> newQ;
+        queue<int> newLowest;
+        while (!q.empty()){
+            set<int> tmp = q.front();
+            int tmpLowest = lowest.front();
+            lowest.pop();
+            q.pop();
+            for (auto &s2Pos: s2Map[s1[tmpLowest]]){
+                if (!((1 << s2Pos) & bit)) continue;
+                if (tmp.find(s2Pos) != tmp.end()){
+                    return tmp;
+                }else{
+                    set<int> newTmp = tmp;
+                    newTmp.insert(s2Pos);
+                    newQ.push(newTmp);
+                    newLowest.push(s2Pos);
+                }
+            }
+        }
+        return BFS(bit, s1, s2, newLowest, newQ);
+    }
+
+    int kSimilarity(string s1, string s2) {
+        long bit((1 << s1.size()) - 1); 
+        for (size_t i = 0; i < s2.size(); i++){
+            if (s1[i] != s2[i]) {
+                s2Map[s2[i]].push_back(i);
+            }else{
+                bit -= (1 << i);
+            }
+        }
+
+        int ans(0);
+        while (bit != 0){
+            int smallestBit = getSmallestBit(bit);
+            queue<int> lowest;
+            queue<set<int>> q;
+            set<int> tmp;
+            lowest.push(smallestBit);
+            tmp.insert(smallestBit);
+            q.push(tmp);
+            tmp = BFS(bit, s1, s2, lowest, q);
+            for (auto &i: tmp){
+                cout << i << " ";
+                bit -= (1 << i);
+            }
+            cout << endl;
+            ans += tmp.size() - 1;
+        }
+
+        return ans;
+    }
+};
