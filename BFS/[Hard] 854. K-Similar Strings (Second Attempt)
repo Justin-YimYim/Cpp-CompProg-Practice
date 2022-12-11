@@ -1,0 +1,72 @@
+class Solution {
+public:
+    unordered_map<char, vector<int>> s2Map;
+
+    vector<int> getPossibleValue(int const &a){
+        int b = a;
+        int lowest(0);
+        vector<int> x;
+        while (b != 0){
+            if (b & 1){
+                x.push_back(lowest);
+            }
+            b >>= 1;
+            lowest++;
+        }
+        return x;
+    }
+
+    set<int> BFS(long const & bit, string const &s1, string const &s2, queue<int>& lowest, queue<set<int>>& q){
+        queue<set<int>> newQ;
+        queue<int> newLowest;
+        while (!q.empty()){
+            set<int> tmp = q.front();
+            int tmpLowest = lowest.front();
+            lowest.pop();
+            q.pop();
+            for (auto &s2Pos: s2Map[s1[tmpLowest]]){
+                if (!((1 << s2Pos) & bit)) continue;
+                if (tmp.find(s2Pos) != tmp.end()){
+                    return tmp;
+                }else{
+                    set<int> newTmp = tmp;
+                    newTmp.insert(s2Pos);
+                    newQ.push(newTmp);
+                    newLowest.push(s2Pos);
+                }
+            }
+        }
+        return BFS(bit, s1, s2, newLowest, newQ);
+    }
+
+    int kSimilarity(string s1, string s2) {
+        long bit((1 << s1.size()) - 1); 
+        for (size_t i = 0; i < s2.size(); i++){
+            if (s1[i] != s2[i]) {
+                s2Map[s2[i]].push_back(i);
+            }else{
+                bit -= (1 << i);
+            }
+        }
+
+        int ans(0);
+        while (bit != 0){
+            vector<int> possibleValues = getPossibleValue(bit);
+            queue<int> smallestBit;
+            queue<set<int>> q;
+            for (auto &i: possibleValues){
+                set<int> tmp;
+                smallestBit.push(i);
+                tmp.insert(i);
+                q.push(tmp);
+            }
+            set<int> tmp = BFS(bit, s1, s2, smallestBit, q);
+            for (auto &i: tmp){
+                bit -= (1 << i);
+            }
+            ans += tmp.size() - 1;
+        }
+
+        return ans;
+    }
+};
