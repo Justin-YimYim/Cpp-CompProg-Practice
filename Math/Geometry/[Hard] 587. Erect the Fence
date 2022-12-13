@@ -1,0 +1,90 @@
+class Solution {
+public:
+    bool checkCCW(const vector<int> &a, const vector<int> &b, const vector<int> &c){
+        int v0 = b[0] - a[0];
+        int v1 = b[1] - a[1];
+        int u0 = c[0] - a[0];
+        int u1 = c[1] - a[1];
+        return (v0 * u1 - v1 * u0) >= 0;
+    }
+
+    vector<vector<int>> outerTrees(vector<vector<int>>& trees) {
+        // cross product positive = anticlockwise
+        if (trees.size() <= 3){
+            return trees;
+        }
+        sort(trees.begin(), trees.end(), [](const vector<int>& a, const vector<int>& b) {
+            if (a[0] == b[0]){
+                return a[1] < b[1];
+            }else{
+                return a[0] < b[0];
+            }
+        });
+        vector<int> smallestX(trees[0]);
+        vector<int> largestX(trees[trees.size() - 1]);
+        stack<vector<int>> leftStack;
+        stack<vector<int>> rightStack;
+        leftStack.push(smallestX);
+        rightStack.push(largestX);
+
+        for (auto forward = trees.begin() + 1; forward != trees.end(); ++forward){
+            while (true){
+                if (leftStack.size() == 1) {
+                    vector<int> tmp(*forward);
+                    leftStack.push(tmp);
+                    break;
+                }
+                vector<int> current(leftStack.top());
+                leftStack.pop();
+                vector<int> last(leftStack.top());
+
+                if (checkCCW(last, current, *forward)){
+                    vector<int> tmp1(current);
+                    leftStack.push(tmp1);
+                    vector<int> tmp(*forward);
+                    leftStack.push(tmp);
+                    break;
+                }
+            }
+        }
+
+        for (auto backward = trees.rbegin() + 1; backward != trees.rend(); ++backward){
+            while (true){
+                if (rightStack.size() == 1) {
+                    vector<int> tmp(*backward);
+                    rightStack.push(tmp);
+                    break;
+                }
+                vector<int> current(rightStack.top());
+                rightStack.pop();
+                vector<int> last(rightStack.top());
+
+                if (checkCCW(last, current, *backward)){
+                    vector<int> tmp1(current);
+                    rightStack.push(tmp1);
+                    vector<int> tmp(*backward);
+                    rightStack.push(tmp);
+                    break;
+                }
+            }
+        }
+
+        // unordered_set cant work with vector
+        set<vector<int>> ans;
+        while (!leftStack.empty()){
+            vector<int> tmp(leftStack.top());
+            ans.insert(tmp);
+            leftStack.pop();
+        }
+        while (!rightStack.empty()){
+            vector<int> tmp(rightStack.top());
+            ans.insert(tmp);
+            rightStack.pop();
+        }
+
+        vector<vector<int>> ans2;
+        ans2.insert(ans2.end(), ans.begin(), ans.end());
+        return ans2;
+
+    }
+};
