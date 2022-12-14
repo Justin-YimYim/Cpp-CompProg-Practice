@@ -9,4 +9,4 @@
 ### cherry pick 4 stage
 - ** for loop is hard to do pruning
 - ** while loop is easier
-### When can think of forward think of other direction
+### When cant think of forward think of other direction
