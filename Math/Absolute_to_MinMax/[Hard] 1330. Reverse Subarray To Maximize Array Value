@@ -1,0 +1,16 @@
+class Solution {
+public:
+    int maxValueAfterReverse(vector<int>& nums) {
+        int x(nums.size());
+        int diff(0), res(0), min2(INT_MAX), max2(INT_MIN);
+        for (size_t i(0); i < x - 1; ++i){
+            diff += abs(nums[i + 1] - nums[i]);
+            res = max(res, abs(nums[0] - nums[i + 1]) - abs(nums[i] - nums[i + 1]));
+            res = max(res, abs(nums[x - 1] - nums[i]) - abs(nums[i] - nums[i + 1]));
+            min2 = min(min2, max(nums[i], nums[i + 1]));
+            max2 = max(max2, min(nums[i], nums[i + 1]));
+        }
+
+        return diff + max(res, (max2 - min2) * 2);
+    }
+};
