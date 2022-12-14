@@ -1,0 +1,12 @@
+class Solution {
+public:
+    int numberOfUniqueGoodSubsequences(string binary) {
+        if (binary.size() == 1) return 1;
+        int dp[2] = {}, mod(1000000007), flag(0);
+        for (auto it = binary.rbegin(); it != binary.rend(); ++it){
+            if (*it == '0') flag = 1;
+            dp[*it - 48] = (1 + dp[0] + dp[1]) % mod; 
+        }
+        return dp[1] + flag;
+    }
+};
