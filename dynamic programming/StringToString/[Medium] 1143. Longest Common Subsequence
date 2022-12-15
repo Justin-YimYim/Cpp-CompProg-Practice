@@ -1,0 +1,28 @@
+class Solution {
+public:
+    string smaller;
+    string larger;
+    int longestCommonSubsequence(string text1, string text2) {
+        if (text1.size() > text2.size()){
+            smaller = text2;
+            larger = text1;
+        }else{
+            smaller = text1;
+            larger = text2;
+        }
+
+        int dp[smaller.size() + 1][larger.size() + 1];
+        memset(dp, 0, sizeof(dp));
+
+        for (size_t i = 1; i <= smaller.size(); ++i){
+            for (size_t j = 1; j <= larger.size(); ++j){
+                if (larger[j - 1] == smaller[i - 1]){
+                    dp[i][j] = max(max(dp[i - 1][j - 1] + 1, dp[i][j - 1]), dp[i - 1][j]);
+                }else{
+                    dp[i][j] = max(dp[i][j - 1], dp[i - 1][j]);
+                }
+            }
+        }
+        return dp[smaller.size()][larger.size()];
+    }
+};
