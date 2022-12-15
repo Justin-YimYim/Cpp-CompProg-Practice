@@ -1,0 +1,11 @@
+class Solution {
+public:
+    int distinctSubseqII(string s) {
+        int mod(1e9+7);
+        vector<int> dp(26, 0);
+        for (auto &ch : s){
+            dp[ch - 'a'] = accumulate(dp.begin(), dp.end(), 1L)%mod;
+        }
+        return accumulate(dp.begin(), dp.end(), 0L)%mod;
+    }
+};
