@@ -1,4 +1,5 @@
 # Dynamic programming
+### It is brute force but use (min/ max) to prune impossible path if it is a combinatorial question
 ### IS ALL ABOUT STATE TRANSFER
 - Intialize
 - Define current state
@@ -10,3 +11,5 @@
 - ** for loop is hard to do pruning
 - ** while loop is easier
 ### When cant think of forward think of other direction
+### Search on state vs space
+- could prune the space
