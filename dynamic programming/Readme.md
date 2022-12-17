@@ -1,4 +1,7 @@
 # Dynamic programming
+## types of dp
+- State transfer dp
+- Combinatorial dp/ dp on graph space
 ### It is brute force but use (min/ max) to prune impossible path if it is a combinatorial question
 ### IS ALL ABOUT STATE TRANSFER
 - Intialize
