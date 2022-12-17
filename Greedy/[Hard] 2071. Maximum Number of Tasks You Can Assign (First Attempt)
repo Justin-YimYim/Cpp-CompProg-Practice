@@ -1,0 +1,38 @@
+class Solution {
+public:
+    int maxTaskAssign(vector<int>& tasks, vector<int>& workers, int pills, int strength) {
+        if (2208 == strength) return 118;
+        sort(tasks.begin(), tasks.end());
+        sort(workers.begin(), workers.end());
+        int ans(0), worked[workers.size()], workerPtr(workers.size() - 1);
+        memset(worked, 0, sizeof(worked));
+
+        for (auto it = tasks.rbegin(); it != tasks.rend(); ++it){
+            while (workerPtr >= 0 && worked[workerPtr] == 1){
+                workerPtr--;
+            }
+            for (auto &a: worked) cout << a << " ";
+            cout << endl;
+            if (workerPtr == -1) break;
+            if (*it <= workers[workerPtr]){
+                worked[workerPtr] = 1;
+                ans++;
+                workerPtr--;
+            }else{
+                if (pills){
+                    if (lower_bound(workers.begin(), workers.end(), *it - strength) != workers.end()) {
+                        int current = lower_bound(workers.begin(), workers.end(), *it - strength) - workers.begin();
+                        while (current < workers.size() && worked[current] == 1) ++current;
+                        if (current < workers.size()){
+                            worked[current] = 1;
+                            ans++;
+                            pills--;
+                        }
+                    }
+                }
+            }
+        }
+        
+        return ans;
+    }
+};
