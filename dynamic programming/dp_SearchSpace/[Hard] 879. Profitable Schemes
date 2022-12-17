@@ -1,0 +1,35 @@
+class Solution {
+public:
+    int profitableSchemes(int N, int P, vector<int>& group, vector<int>& profit) {
+        long long dp[group.size()][N + 1][P + 1], mod(1e9 + 7);
+        memset(dp, 0, sizeof(dp));
+        if (group[0] <= N) dp[0][group[0]][min(profit[0], P)] = 1;
+
+        for (size_t i = 1; i < group.size(); ++i){
+            for (int j = 0; j <= N; ++j){
+                for (int k = 0; k <= P; ++k){
+                    dp[i][j][k] = dp[i - 1][j][k];
+                }
+            }
+
+            for (int j = group[i]; j <= N; ++j){
+                for (int k = 0; k <= P; ++k){
+                    int tmp(min(k + profit[i], P));
+                    dp[i][j][tmp] += (dp[i - 1][j - group[i]][k]) %= mod;
+                }
+            }
+            if (group[i] <= N) dp[i][group[i]][min(profit[i], P)] = (dp[i - 1][group[i]][min(profit[i], P)] + 1l) % mod;
+        }
+
+        long long ans(0);
+        for (int i = 0; i <= N; ++i){
+            (ans += dp[group.size() - 1][i][P]) %= mod; 
+        }
+
+        if (P == 0){
+            (ans += 1) %= mod;
+        }
+        
+        return ans;
+    }
+};
