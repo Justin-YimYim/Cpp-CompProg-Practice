@@ -1,0 +1,49 @@
+class Solution {
+public:
+    vector<vector<int>> validArrangement(vector<vector<int>>& pairs) {
+        unordered_map<int, vector<int>> graph;
+        unordered_map<int, vector<int>> count;
+
+        // initiate graph and count
+        for (auto &pair: pairs){
+            graph[pair[0]].push_back(pair[1]);
+            if (count[pair[0]].empty()){
+                count[pair[0]].push_back(0);
+                count[pair[0]].push_back(0);
+            }
+            if (count[pair[1]].empty()){
+                count[pair[1]].push_back(0);
+                count[pair[1]].push_back(0);
+            }
+            count[pair[0]][0]++;
+            count[pair[1]][1]++;
+        }
+
+        // find begin and ends
+        vector<vector<int>> ans;
+        int current(-1), last(-1), lastCount(INT_MAX);
+        for (auto &pair: count){
+            if (pair.second[0] > pair.second[1]) current = pair.first;
+            else if (pair.second[1] > pair.second[0]) {
+                last = pair.first;
+                lastCount = pair.second[1];
+                }
+            }
+        if (current == -1) current = graph.begin()->first;
+        Eulerian(graph, ans, current);
+        reverse(ans.begin(), ans.end());
+
+        return ans;
+    }
+
+    void Eulerian(unordered_map<int, vector<int>>& graph, vector<vector<int>>& ans, int& curr){
+        auto& stk = graph[curr];
+        while (!stk.empty()) {
+            int nei = *(stk.end() - 1);
+            stk.pop_back();
+            Eulerian(graph, ans, nei);
+			// postorder
+            ans.push_back({curr, nei});
+        }
+    }
+};
