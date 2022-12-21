@@ -1,0 +1,24 @@
+class Solution {
+public:
+    void eulerCircuit(vector<string> &ans, map<string, multiset<string>> &graph, string current){
+        multiset<string> &st = graph[current];
+        while (!st.empty()) {
+            string nei = *(st.begin());
+            st.erase(st.begin());
+            eulerCircuit(ans, graph, nei);
+            ans.push_back(nei);
+        }
+    }
+
+    vector<string> findItinerary(vector<vector<string>>& tickets) {
+        vector<string> ans;
+        map<string, multiset<string>> graph;
+        for (auto &edge: tickets){
+            graph[edge[0]].insert(edge[1]);
+        }
+        eulerCircuit(ans, graph, "JFK");
+        ans.push_back("JFK");
+        reverse(ans.begin(), ans.end());
+        return ans;
+    }
+};
