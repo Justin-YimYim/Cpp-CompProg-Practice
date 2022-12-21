@@ -12,3 +12,13 @@
 # Hamilton Circuit
 ### Definition
 - Each vertex go once and only once
+### Necessary Condition
+- All nodes have a degree >= 2
+# De Bruijn Graph (Could create an Eulerian Walk)
+- Each edge for one k-mer
+- Each node for one (k - 1)-mer
+### Construction
+- Genome: AAABBBBA
+- K-mer: AAA, AAB, ABB, BBB, BBB, BBA
+- K-1 mer: (AA, AA), (AA, AB)...
+=> Construct De Bruijn graph but creating node from k-mer[0] and k-mer[1]
