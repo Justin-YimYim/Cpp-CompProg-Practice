@@ -22,3 +22,6 @@
 - K-mer: AAA, AAB, ABB, BBB, BBB, BBA
 - K-1 mer: (AA, AA), (AA, AB)...
 => Construct De Bruijn graph but creating node from k-mer[0] and k-mer[1]
+### De Bruijn to Euler to Hamilton
+- Suffix + next => suffix transfer => all edges 
+- All combinations and walk once => all nodes 
