@@ -1,9 +1,9 @@
 # Euler Circuit
 ### Algorithm (Hierholzer's Algorithm)
 - while graph[current] not empty()
--- get one and delete one 
--- recursion
--- add new node
+  - get one and delete one 
+  - recursion
+  - add new node
 ### Definition
 - Each edge go once and only once
 ### Existence 
