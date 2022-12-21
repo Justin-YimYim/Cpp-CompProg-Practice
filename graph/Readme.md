@@ -1,5 +1,5 @@
 # Euler Circuit
-### Algorithm
+### Algorithm (Hierholzer's Algorithm)
 - while graph[current] not empty()
 -- get one and delete one 
 -- recursion
