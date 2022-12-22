@@ -1,0 +1,43 @@
+class Record{
+public:
+    vector<int> childs;
+    int numChild;
+    int paths;
+    Record() = default;
+};
+
+class Solution {
+public:
+    void BFS(int current, vector<int>& searched, unordered_map<int, vector<int>>& tree, unordered_map<int, Record>& records){
+        auto& nd = tree[current];
+        queue<int> crt_childs;
+        for (auto &a: nd){
+            if (searched[a] == 0){
+                crt_childs.push(a);
+                searched[a] = 1;
+            }
+        }
+        records[current] = Record();
+        if (crt_childs.empty()) return;
+        while (!crt_childs.empty()){
+            int next = crt_childs.front();
+            BFS(next, searched, tree, records);
+            records[current].childs.push_back(next);
+            records[current].numChild += 1 + records[next].numChild;
+            records[current].paths += records[next].numChild + 1 + records[next].paths;
+            crt_childs.pop();
+        }
+    }
+    void BFSCount(int current, vector<int>& ans, int prt, unordered_map<int, Record>& records, int totalNode){
+        ans[current] = ans[prt] + (totalNode - 2) - records[current].numChild * 2;
+        for (auto &a: records[current].childs){
+            BFSCount(a, ans, current, records, totalNode);
+        } 
+    }
+    vector<int> sumOfDistancesInTree(int n, vector<vector<int>>& edges) {
+        if (edges.size() == 0) return {0};
+
+        unordered_map<int, vector<int>> tree;
+        for (auto &pair: edges){
+            tree[pair[0]].push_back(pair[1]);
+    
