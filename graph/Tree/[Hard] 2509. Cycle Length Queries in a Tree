@@ -1,0 +1,28 @@
+class Solution {
+public:
+    vector<int> cycleLengthQueries(int n, vector<vector<int>>& queries) {
+        vector<int> ans;
+        for (auto &pair: queries){
+            int larger, smaller;
+            if (pair[0] > pair[1]){
+                arger = pair[0];
+                smaller = pair[1];
+            }else {
+                larger = pair[1];
+                smaller = pair[0];
+            }
+            int count(0);
+            while (larger != smaller){
+                if (larger > smaller){
+                    larger /= 2;
+                    count++;
+                }else{
+                    smaller /=2;
+                    count++;
+                }
+            }
+            ans.push_back(++count);
+        }
+        return ans;
+    }
+};
