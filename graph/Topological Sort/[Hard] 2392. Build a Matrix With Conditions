@@ -1,0 +1,75 @@
+class Solution {
+public:
+    vector<vector<int>> buildMatrix(int k, vector<vector<int>>& rowConditions, vector<vector<int>>& colConditions) {
+        unordered_map<int, multiset<int>> rowTree;
+        vector<int> rowImmediateChild(k + 1, 0);
+        unordered_map<int, multiset<int>> colTree;
+        vector<int> colImmediateChild(k + 1, 0);
+
+        // Initiate the Tree for row conditions
+        for (auto &row: rowConditions){
+            rowImmediateChild[row[1]]++;
+            rowTree[row[0]].insert(row[1]);
+        }
+        vector<int> rowAns;
+        queue<int> tmp;
+        for (int i = 1; i <= k; ++i){
+            if (rowImmediateChild[i] == 0) {
+                rowImmediateChild[i] = -1;
+                tmp.push(i);
+            }
+        }
+        while (!tmp.empty()){
+            int current = tmp.front();
+            cout << current << ends;
+            tmp.pop();
+            rowAns.push_back(current);
+            for (auto &prt: rowTree[current]) {
+                rowImmediateChild[prt]--;
+                if (rowImmediateChild[prt] == 0){
+                    rowImmediateChild[prt] = -1;
+                    tmp.push(prt);
+                }
+            }
+        }
+        // If circle exists, condtion broke
+        if (rowAns.size() != k) return {};
+
+        // Initiaite the Tree for col condtions
+        for (auto &col: colConditions){
+            colImmediateChild[col[1]]++;
+            colTree[col[0]].insert(col[1]);
+        }
+        vector<int> colAns;
+        for (int i = 1; i <= k; ++i){
+            if (colImmediateChild[i] == 0) {
+                colImmediateChild[i] = -1;
+                tmp.push(i);
+            }
+        }
+        while (!tmp.empty()){
+            int current = tmp.front();
+            tmp.pop();
+            colAns.push_back(current);
+            for (auto &prt: colTree[current]) {
+                colImmediateChild[prt]--;
+                if (colImmediateChild[prt] == 0){
+                    colImmediateChild[prt] = -1;
+                    tmp.push(prt);
+                }
+            }
+        }
+        // If circle exists, condtion broke
+        if (colAns.size() != k) return {};
+
+        // Form matrix
+        vector<vector<int>> ans(k, vector<int>(k));
+        for (int i = 0; i < k; ++i){
+            int key(rowAns[i]), flag(0);
+            while (colAns[flag] != key) flag++;
+            ans[i][flag] = key;
+        }
+
+        return ans;
+    }
+};
