@@ -26,4 +26,3 @@ while (left <= right):\
 # Ideas
 - Serach data set
 - Search answer space
-- 
