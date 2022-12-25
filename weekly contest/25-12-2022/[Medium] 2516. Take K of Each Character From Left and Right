@@ -1,0 +1,35 @@
+class Solution {
+public:
+    int takeCharacters(string s, int k) {
+        const long long a6(1e6);
+        const long long a12(1e12);
+        long long count(k * a12 + k * a6 + k); 
+        long long match(0);
+        int lptr(0), rptr(s.size() - 1), ans(0), sSize(s.size());
+        while (lptr < s.size() && (count > match || count % a12 > match % a12 || count % a6 > match % a6)){
+            if (s[lptr] == 'a') match += a12;
+            else if (s[lptr] == 'b') match += a6;
+            else match += 1;
+            lptr++;
+        }
+        if (count > match || count % a12 > match % a12 || count % a6 > match % a6) return -1;
+        ans = lptr;
+        lptr--;
+        while (lptr >= 0 && rptr >= 0){
+            while (lptr >= 0 && (match >= count && match % a12 >= count % a12 && match % a6 >= count % a6)){
+                if (s[lptr] == 'a') match -= a12;
+                else if (s[lptr] == 'b') match -= a6;
+                else match -= 1;
+                lptr--;
+                if (match >= count && match % a12 >= count % a12 && match % a6 >= count % a6) ans = min(ans, lptr + (sSize - rptr));
+            }
+            while (rptr >= 0 && (count > match || count % a12 > match % a12 || count % a6 > match % a6)){
+                if (s[rptr] == 'a') match += a12;
+                else if (s[rptr] == 'b') match += a6;
+                else match += 1;
+                rptr--;
+            }
+        }
+        return ans;
+    }
+};
