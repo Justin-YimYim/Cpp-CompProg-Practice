@@ -1,0 +1,21 @@
+class Solution {
+public:
+    int closetTarget(vector<string>& words, string target, int startIndex) {
+        unordered_map<string, vector<int>> hash;
+        for (int i = 0; i < words.size(); ++i){
+            hash[words[i]].push_back(i);
+        }
+        if (hash.find(target) != hash.end()){
+            int ans(INT_MAX);
+            for (auto &a: hash[target]){
+                int tmp1(startIndex - a);
+                int tmp2(a - startIndex);
+                if (tmp2 < 0) tmp2 += words.size();
+                if (tmp1 < 0) tmp1 += words.size();
+                ans = min(tmp1, ans);
+                ans = min(tmp2, ans);
+            }
+            return ans;
+        }else return -1;
+    }
+};
