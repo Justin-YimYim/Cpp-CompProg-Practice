@@ -22,3 +22,8 @@ while (left <= right):\
     &nbsp;&nbsp;left = mid + 1;\
   &nbsp;else found/ not found:\
     &nbsp;&nbsp;return mid;\
+
+# Ideas
+- Serach data set
+- Search answer space
+- 
