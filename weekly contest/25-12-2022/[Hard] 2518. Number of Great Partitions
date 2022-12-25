@@ -1,0 +1,31 @@
+class Solution {
+public:
+    int countPartitions(vector<int>& nums, int k) {
+        int n = nums.size(); 
+        long long dp[2000]{};
+        dp[0] = 1;
+        long long total_sum(0); 
+        const int m = 1e9 + 7;
+        long long total_case(1);
+        
+        for(int i = 0; i < nums.size(); i++){
+            (total_case*=2)%= m;
+            total_sum+= nums[i];
+        }
+        
+        if(total_sum < 2*k)return 0;
+        
+        //dp[i] = total number of sum == i
+        for(int i = 0; i < n; i++){
+            for(int j = k - 1; j >= nums[i]; j--){
+                (dp[j] +=dp[j - nums[i]])%=m;
+            }
+        }
+        long long ans = 0;
+        for(int i = 0;i < k; i++){
+            (ans += dp[i])%=m;
+        }
+        cout << ans << endl;
+        return (total_case + m - 2*ans + m)%m;
+    }
+};
