@@ -1,0 +1,46 @@
+class Solution {
+public:
+    vector<int> countSmaller(vector<int>& nums) {
+        vector<vector<int>> arr;
+        int last(0), numSize(nums.size()); 
+        for (int i = 0; i < numSize; ++i) arr.push_back({nums[i], i, 0});
+        mergeSort(arr, 0, numSize - 1);
+        vector<int> ans(numSize);
+        for (int it = numSize - 2; it >= 0; --it) {
+            if (arr[it][0] == arr[it + 1][0]) last++;
+            else last = 0;
+            ans[arr[it][1]] = numSize - it - 1 - arr[it][2] - last;
+            }
+        return ans;
+    }
+
+    void mergeSort(vector<vector<int>>& arr, int l, int r){
+        if (l >= r) return;
+        int mid(l + (r - l) / 2);
+        mergeSort(arr, l, mid);
+        mergeSort(arr, mid + 1, r);
+        merge(arr, l, mid + 1, r + 1);
+    }
+
+    void merge(vector<vector<int>> &arr, int l, int mid, int r){
+        vector<vector<int>> leftArr(arr.begin() + l, arr.begin() + mid);
+        vector<vector<int>> rightArr(arr.begin() + mid, arr.begin() + r);
+        auto it1(leftArr.begin()), it2(rightArr.begin());
+        while (it1 != leftArr.end() && it2 != rightArr.end()){
+            if ((*it1)[0] < (*it2)[0]) {
+                ((*it2)[2]) += leftArr.end() - it1;
+                arr[l] = (*it2);
+                it2++;
+            }else{
+                arr[l] = (*it1);
+                it1++;
+            }
+            l++;
+        }
+        if (it1 != leftArr.end()){
+            copy(it1, leftArr.end(), arr.begin() + l);
+        }else{
+            copy(it2, rightArr.end(), arr.begin() + l);
+        }
+    }
+};
