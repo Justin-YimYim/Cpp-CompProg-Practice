@@ -1,0 +1,15 @@
+class Solution {
+public:
+    vector<int> countSmaller(vector<int>& nums) {
+        vector<vector<int>> merger;
+        for (int i = 0; i < nums.size(); ++i) merger.push_back({nums[i], i});
+        sort(merger.begin(), merger.end(), [](vector<int> a, vector<int> b){return a[0] != b[0]? a[0] < b[0] : a[1] < b[1];});
+        vector<int> tmp, ans(nums.size());
+        for (auto it = merger.begin(); it != merger.end(); ++it){
+            auto target = lower_bound(tmp.begin(), tmp.end(), (*it)[1]);
+            ans[(*it)[1]] = tmp.end() - target;
+            tmp.insert(target, (*it)[1]);
+        }
+        return ans;
+    }
+};
