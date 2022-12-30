@@ -1,0 +1,44 @@
+using ll = long long;
+class Solution {
+public:
+    long minimumDifference(vector<int>& nums) {
+        unordered_map<int, set<int>> dict;
+        int half(1 << (nums.size() / 2)), loop(0), halfNums(nums.size() / 2);
+        long sum(accumulate(nums.begin(), nums.end(), 0));
+        long target(sum / 2);
+        cout << sum << " " << target << endl;
+        while (loop < half){
+            long tmp(0), tmpCount(0), tmpLoop(loop);
+            while (tmpLoop > 0){
+                if ((tmpLoop & 1) == 1) tmp += nums[tmpCount];
+                tmpCount++;
+                tmpLoop >>= 1;
+            }
+            dict[checkBit(loop)].insert(tmp);
+            loop++;
+        }
+        loop = 0;
+        long ans(INT_MAX);
+        while (loop < half){
+            long tmp(0), tmpCount(0), tmpLoop(loop);
+            while (tmpLoop > 0){
+                if ((tmpLoop & 1) == 1) tmp += nums[tmpCount + halfNums];
+                tmpCount++;
+                tmpLoop >>= 1;
+            }
+            if (dict[halfNums - checkBit(loop)].upper_bound(target - tmp) != dict[halfNums - checkBit(loop)].begin()) ans = min(target - (*(--dict[halfNums - checkBit(loop)].upper_bound(target - tmp)) + tmp), ans);
+            if (ans == 0) return abs(sum - target * 2);
+            loop++;
+        }
+        cout << ans << endl;
+        return 2 * ans + sum - target * 2;
+    }
+    int checkBit(int n){
+        int count(0);
+        while (n > 0){
+            if ((n & 1) == 1) count++;
+            n >>= 1;
+        }
+        return count;
+    }
+};
