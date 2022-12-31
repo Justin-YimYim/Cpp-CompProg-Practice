@@ -1,0 +1,71 @@
+class Solution {
+struct SegmentTree{
+    vector<int> count;
+    SegmentTree(int n): count(n * 4, 0){}
+
+    void add(int L, int R, const int& value, int vertex){
+        count[vertex]++;
+        int mid((L + R) / 2);
+        if (L == R) return;
+        if (mid < value) add(mid + 1, R, value, vertex * 2 + 2);
+        else add(L, mid, value, vertex * 2 + 1);
+    }
+    int querySmaller(int L, int R, const int& value, int vertex){
+        int mid((L + R) / 2);
+        if (R < value) return 0;
+        if (R == L) return count[vertex];
+        if (mid < value) return count[vertex * 2 + 1] + querySmaller(mid + 1, R, value, vertex * 2 + 2);
+        else return querySmaller(L, mid, value, vertex * 2 + 1);
+    }
+
+    int queryLarger(int L, int R, const int& value, int vertex){
+        // cout << L << " " << R << " " << " " << value << " " << vertex << endl;
+        int mid((L + R) / 2);
+        if (R < value) return 0;
+        if (L == R) return count[vertex];
+        if (mid >= value) return count[vertex * 2 + 2] + queryLarger(L, mid, value, vertex * 2 + 1);
+        else return queryLarger(mid + 1, R, value, vertex * 2 + 2);
+    }
+};
+
+public:
+    int countRangeSum(vector<int>& nums, int lower, int upper) {
+        int sum(0), i(1);
+        set<int> tmp;
+        unordered_map<int, int> dict;
+        vector<int> tmp2;
+        unordered_map<int, pair<int, int>> valueToLU;
+        for (auto &a: nums) {
+            a = sum += a;
+            tmp.insert(a);
+        }
+        tmp.insert(0);
+        for (auto &a: tmp){
+            dict[a] = i;
+            tmp2.push_back(a);
+            ++i;
+        }
+        for (auto &a: tmp2) {
+            valueToLU[a] = {lower_bound(tmp2.begin(), tmp2.end(), lower + a) - tmp2.begin() + 1, upper_bound(tmp2.begin(), tmp2.end(), upper + a) - tmp2.begin()};
+        }
+
+        for (auto &a: valueToLU) cout << a.first << " " << a.second.first << " " << a.second.second << endl;
+
+        SegmentTree segTree(tmp.size());
+        int tmpAns(0), loop(0);
+        for (auto it = nums.rbegin(); it != nums.rend(); it++){
+            tmpAns += segTree.querySmaller(1, tmp.size(), valueToLU[*it].second, 0);
+            tmpAns += segTree.queryLarger(1, tmp.size(), valueToLU[*it].first, 0);
+            segTree.add(0, tmp.size(), dict[*it], 0);
+            tmpAns -= loop;
+            cout << tmpAns << endl;
+            loop++;
+        }
+        for (auto &a: tmp2) cout << a << " ";
+        cout << endl;
+        tmpAns += segTree.querySmaller(1, tmp.size(), valueToLU[0].second, 0);
+        tmpAns += segTree.queryLarger(1, tmp.size(), valueToLU[0].first, 0);
+        cout << tmpAns << endl;
+        return tmpAns - loop;
+    }
+};
