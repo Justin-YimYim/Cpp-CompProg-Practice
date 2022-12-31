@@ -1,0 +1,38 @@
+class Solution {
+struct SegmentTree{
+    vector<int> count; 
+    SegmentTree(int n): count(4 * n, 0){}
+    void add(int L, int R, int value, int vertex){
+        count[vertex]++;
+        if (L == R) return;
+        int mid((L + R) / 2);
+        if (mid >= value) add(L, mid, value, vertex * 2 + 1);
+        else if (mid < value) add(mid + 1, R, value, vertex * 2 + 2);
+    }
+    int query(int L, int R, int value, int vertex){
+        if (R == value) return count[vertex];
+        int mid((L + R) / 2);
+        if (mid < value) return count[vertex * 2 + 1] + query(mid + 1, R, value, vertex * 2 + 2);
+        else return query(L, mid, value, vertex * 2 + 1);
+    }
+};
+public:
+vector<int> countSmaller(vector<int>& nums){
+    set<int> tmp;
+    unordered_map<int, int> dict;
+    for (auto &a: nums) tmp.insert(a);
+    int i = 1;
+    for (auto &a: tmp) {
+        dict[a] = i;
+        ++i;
+    }
+    SegmentTree tree(tmp.size());
+    vector<int> ans(nums.size());
+    for (int it = nums.size() - 1; it >= 0; it--){
+        if (dict[nums[it]] == 1) ans[it] = 0;
+        else ans[it] = tree.query(1, tmp.size(), dict[nums[it]] - 1, 0);
+        tree.add(1, tmp.size(), dict[nums[it]], 0);
+        }
+    return ans;
+    }
+};
