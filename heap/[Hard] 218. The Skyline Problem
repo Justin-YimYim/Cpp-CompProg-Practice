@@ -1,0 +1,62 @@
+using vint = vector<int>;
+class Solution {
+public:
+    vector<vector<int>> getSkyline(vector<vector<int>>& buildings) {
+        auto cmp = [](const vint &a, const vint &b){return a[2] < b[2];};
+        priority_queue<vint, vector<vint>, decltype(cmp)> heap(cmp);
+        vector<vector<int>> ans;
+        int crtX1(0);
+        for (auto &building: buildings){
+            if (heap.empty()){
+                heap.push(building);
+                crtX1 = building[0];
+            }else{
+                while (!heap.empty() && heap.top()[1] < building[0]){
+                    if (crtX1 >= heap.top()[1]) heap.pop();
+                    else{
+                        if (ans.size() > 1 && crtX1 >= heap.top()[0] && ans.back().back() == heap.top()[2]) crtX1 = heap.top()[1];
+                        else{
+                            ans.push_back({crtX1, heap.top()[2]});
+                            crtX1 = heap.top()[1];
+                        }
+                        heap.pop();
+                    }
+                }
+                if (heap.empty()){
+                    ans.push_back({crtX1, 0});
+                    heap.push(building);
+                    crtX1 = building[0];
+                }else{
+                    if (heap.top()[1] >= building[0]){
+                        if (building[2] > heap.top()[2]){
+                            if (crtX1 == building[0]) heap.push(building);
+                            else{
+                                ans.push_back({crtX1, heap.top()[2]});
+                                heap.push(building);
+                                crtX1 = building[0];
+                            }
+                        }
+                        else if (building[2] == heap.top()[2]){
+                            auto &tmp = const_cast<vint&>(heap.top());
+                            tmp[1] = max(heap.top()[1], building[1]);
+                        }
+                        else heap.push(building);
+                    }
+                }
+            }
+        }
+        while (!heap.empty()){
+            if (crtX1 >= heap.top()[1]) heap.pop();
+            else{
+                if (ans.size() > 1 && crtX1 >= heap.top()[0] && ans.back().back() == heap.top()[2]) crtX1 = heap.top()[1];
+                else{
+                    ans.push_back({crtX1, heap.top()[2]});
+                    crtX1 = heap.top()[1];
+                }
+                heap.pop();
+            }
+        }
+        ans.push_back({crtX1, 0});
+        return ans;
+    }
+};
