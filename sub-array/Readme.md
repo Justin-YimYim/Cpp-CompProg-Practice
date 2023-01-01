@@ -11,6 +11,7 @@
 - Could not be modified
 - Using dp
 # Segment Tree -> improvement of sparse table
+### Used A lot in counting problems
 - Space Compexity = 2 * leave number < 4n
 - Query: range / Modify: range/ index 
 - We could open a 4n array
