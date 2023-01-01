@@ -1,0 +1,23 @@
+class Solution {
+public:
+    int distinctPrimeFactors(vector<int>& nums) {
+        set<int> count;
+        for (auto &a: nums) counter(count, a);
+        return count.size();
+    }
+    
+    void counter(set<int> &count, int n){
+        while (n % 2 == 0){
+            count.insert(2);
+            n /= 2;
+        }
+        
+        for (int i = 3; i <= sqrt(n); i += 2){
+            while (n % i == 0){
+                count.insert(i);
+                n /= i;
+            }
+        }
+        if (n > 2) count.insert(n);
+    }
+};
