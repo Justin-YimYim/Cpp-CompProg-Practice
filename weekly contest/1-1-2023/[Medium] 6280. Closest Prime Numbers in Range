@@ -1,0 +1,38 @@
+class Solution {
+public:
+    vector<int> closestPrimes(int left, int right) {
+        if (left == 1) left++;
+        if (left > right) return {-1, -1};
+        vector<int> allPrimes;
+        bool primes[right + 1];
+        memset(primes, true, sizeof(primes));
+ 
+        for (int p = 2; p * p <= right; p++) {
+            if (primes[p] == true) {
+                for (int i = p * p; i <= right; i += p)
+                    primes[i] = false;
+            }
+        }
+
+        for (; left <= right; left++) if (primes[left]) allPrimes.push_back(left);
+
+        vector<int> ans;
+        int min(INT_MAX);
+        if (allPrimes.size() == 1) return {-1, -1};
+        else {
+            for (int i = 1; i != allPrimes.size(); i++){
+                if (allPrimes[i] - allPrimes[i - 1] < min) {
+                    min = allPrimes[i] - allPrimes[i - 1];
+                    if (ans.empty()) {ans.push_back(allPrimes[i - 1]); ans.push_back(allPrimes[i]);}
+                    else {
+                        ans[0] = allPrimes[i - 1];
+                        ans[1] = allPrimes[i];
+                    }
+                }
+            }
+        }
+        
+        return ans;
+    } 
+};
+
