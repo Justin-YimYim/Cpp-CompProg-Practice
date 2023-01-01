@@ -1,0 +1,18 @@
+class Solution {
+public:
+    int minimumPartition(string s, int k) {
+        int count(0), ptr(0), leng(1);
+        while (ptr + leng <= s.size()){
+            if (stol(s.substr(ptr, leng)) <= k) leng++;
+            else{
+                if (leng == 1) return -1;
+                else {
+                    ptr += leng - 1;
+                    leng = 1;
+                    count++;
+                }
+            }
+        }
+        return ++count;
+    }
+};
