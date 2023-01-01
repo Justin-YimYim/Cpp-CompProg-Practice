@@ -1,0 +1,15 @@
+class Solution {
+public:
+    int countDigits(int num) {
+        int tmp = num, count(0);
+        unordered_map<int, int> digits2;
+        while (tmp > 0){
+            digits2[tmp % 10]++;
+            tmp /= 10;
+        }
+        for (auto it = digits2.begin(); it != digits2.end(); it++){
+            if (num % (*it).first == 0) count += (*it).second;
+        }
+        return count;
+    }
+};
