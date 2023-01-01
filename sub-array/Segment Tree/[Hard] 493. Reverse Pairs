@@ -1,0 +1,43 @@
+struct SegmentTree{
+    vector<int> count; 
+    SegmentTree(int n): count(4 * n, 0){}
+    void add(int L, int R, int value, int vertex){
+        count[vertex]++;
+        if (L == R) return;
+        int mid((L + R) / 2);
+        if (mid >= value) add(L, mid, value, vertex * 2 + 1);
+        else if (mid < value) add(mid + 1, R, value, vertex * 2 + 2);
+    }
+    int query(int L, int R, int value, int vertex){
+        if (R == value) return count[vertex];
+        int mid((L + R) / 2);
+        if (mid < value) return count[vertex * 2 + 1] + query(mid + 1, R, value, vertex * 2 + 2);
+        else return query(L, mid, value, vertex * 2 + 1);
+    }
+};
+
+class Solution {
+public:
+    int reversePairs(vector<int>& nums) {
+        set<int> tmp;
+        vector<long> tmp2;
+        unordered_map<long, int> dict, dict2;
+        int i(0);
+        for (auto &a: nums) tmp.insert(a);
+        tmp2.push_back(-(1L << 32));
+        for (auto &a: tmp) {
+            dict[a] = ++i;
+            tmp2.push_back(a);
+        }
+        dict[-(1L << 32)] = 0;
+
+        for (auto &a: tmp2) dict2[a] = max(0, int(upper_bound(tmp2.begin(), tmp2.end(), static_cast<long double>(a) / 2 - 0.5) - tmp2.begin() - 1));
+        int ans(0);
+        SegmentTree segTree(nums.size());
+        for (auto it = nums.rbegin(); it != nums.rend(); ++it){
+            ans += segTree.query(0, tmp.size(), dict2[*it], 0);
+            segTree.add(0, tmp.size(), dict[*it], 0);
+        }
+        return ans;
+    }
+};
