@@ -1,0 +1,70 @@
+typedef struct SegmentTreeMaxWithLazyTag{
+    vector<int> count;
+    vector<int> lazyTag;
+    SegmentTreeMaxWithLazyTag(int n): count(n * 4, 0), lazyTag(n * 4, 0){}
+
+    void propogateRoot(int vertex, int value){
+        if (vertex == 0) return;
+        vertex = (vertex - 1) / 2;
+        if (count[vertex] < value) {
+            count[vertex] = value;
+            propogateRoot(vertex, value);
+        }
+    }
+
+    void setMax(int l, int r, int L, int R, int value, int vertex){
+        if (l == L && r == R){
+            count[vertex] = max(value, count[vertex]);
+            lazyTag[vertex] = max(value, lazyTag[vertex]); 
+            propogateRoot(vertex, value);
+            return;
+        }
+        int mid((L + R) / 2);
+        if (mid < l) setMax(l, r, mid + 1, R, value, vertex * 2 + 2);
+        else if (mid >= r) setMax(l, r, L, mid, value, vertex * 2 + 1);
+        else {
+            setMax(l , mid, L, mid, value, vertex * 2 + 1);
+            setMax(mid + 1, r, mid + 1, R, value, vertex * 2 + 2);
+        }
+    }
+
+    int query(int l, int r, int L, int R, int vertex, int lazy){
+        if (l == L && r == R){
+            return max(lazy, count[vertex]);
+        }
+        int mid((L + R) / 2);
+        lazy = max(lazyTag[vertex], lazy);
+        if (mid < l) return query(l, r, mid + 1, R, vertex * 2 + 2, lazy);
+        else if (mid >= r) return query(l, r, L, mid, vertex * 2 + 1, lazy);
+        else 
+            return max(query(l , mid, L, mid, vertex * 2 + 1, lazy), query(mid + 1, r, mid + 1, R, vertex * 2 + 2, lazy));
+    }
+
+} SegmentTree;
+
+class Solution {
+public:
+    vector<int> fallingSquares(vector<vector<int>>& positions) {
+        set<int> tmp;
+        unordered_map<int, int> dict;
+        int i(1);
+        for (auto &pos: positions){
+            tmp.insert(pos[0]);
+            tmp.insert(pos[0] + pos[1] - 1);
+        }
+        for (auto &a: tmp) {
+            dict[a] = i;
+            ++i;
+        }
+
+        SegmentTree segTree(tmp.size());
+        vector<int> ans;
+        int tmpMax;
+        for (auto &pos: positions){
+            tmpMax = segTree.query(dict[pos[0]], dict[pos[0] + pos[1] - 1], 1, tmp.size(), 0, 0);
+            segTree.setMax(dict[pos[0]], dict[pos[0] + pos[1] - 1], 1, tmp.size(), tmpMax + pos[1], 0);
+            ans.push_back(segTree.query(1, tmp.size(), 1, tmp.size(), 0, 0));
+        }
+        return ans;
+    }
+};
