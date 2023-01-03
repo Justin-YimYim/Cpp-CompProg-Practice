@@ -1,0 +1,107 @@
+typedef struct SegmentTree2dSumWithSkippingLeavePropagate{
+    vector<vector<int>> count;
+    vector<vector<bool>> lazyTag;
+    unordered_map<long, long> dictX, dictXr, dictY, dictYr;
+    int mod;
+    SegmentTree2dSumWithSkippingLeavePropagate(int n, int m): count(4 * n, vector<int>(4 * m)), mod(1e9 + 7), lazyTag(4 * n, vector<bool>(4 * m, false)){}
+
+    void propogateRoot(int vertexX, int vertexY){
+        if (vertexX == 0 && vertexY == 0) return;
+        int vertexXComp = (vertexX % 2? vertexX + 1: vertexX - 1);
+        int vertexYComp = (vertexY % 2? vertexY + 1: vertexY - 1);
+        int a(count[vertexX][vertexY]), b(count[vertexX][vertexYComp]), c(count[vertexXComp][vertexY]), d(count[vertexXComp][vertexYComp]);
+        vertexX = (vertexX - 1) / 2;
+        vertexY = (vertexY - 1) / 2;
+        // cout << a << " " << b << " " << c << " " << d << endl;
+        if (!lazyTag[vertexX][vertexY]) count[vertexX][vertexY] = (((a + b) % mod + c) % mod + d) % mod;
+        propogateRoot(vertexX, vertexY);
+    }
+
+    void modify(int x1, int x2, int y1, int y2, int X1, int X2, int Y1, int Y2, int vertexX, int vertexY){
+        // cout << x1 << " " << x2 << " " << y1 << ' ' << y2 << endl;
+        // cout << X1 << " " << X2 << " " << Y1 << " " << Y2 << endl;
+        // cout << vertexX << " " << vertexY << endl;
+        if (x1 == X1 && x2 == X2 && y1 == Y1 && y2 == Y2){
+            long xRange = (x1 == x2? dictXr[x1 + 1] - dictXr[x1]: dictXr[x2 + 1] - dictXr[x1]);
+            long yRange = (y1 == y2? dictYr[y1 + 1] - dictYr[y1]: dictYr[y2 + 1] - dictYr[y1]);
+            count[vertexX][vertexY] = (xRange * yRange) % mod;
+            lazyTag[vertexX][vertexY] = true;
+            propogateRoot(vertexX, vertexY);
+            return;
+        }
+        // cout << "asdf" << endl;
+        int midX((X1 + X2) / 2), midY((Y1 + Y2) / 2);
+        if (midX < x1){
+            if (midY < y1){
+                modify(x1, x2, y1, y2, midX + 1, X2, midY + 1, Y2, vertexX * 2 + 2, vertexY * 2 + 2);
+            }else if (midY >= y2){
+                modify(x1, x2, y1, y2, midX + 1, X2, Y1, midY, vertexX * 2 + 2, vertexY * 2 + 1);
+            }else{
+                modify(x1, x2, y1, midY, midX + 1, X2, Y1, midY, vertexX * 2 + 2, vertexY * 2 + 1);
+                modify(x1, x2, midY + 1, y2, midX + 1, X2, midY + 1, Y2, vertexX * 2 + 2, vertexY *2 + 2);
+            }
+        }
+        else if (midX >= x2){
+            if (midY < y1){
+                modify(x1, x2, y1, y2, X1, midX, midY + 1, Y2, vertexX * 2 + 1, vertexY * 2 + 2);
+            }else if (midY >= y2){
+                modify(x1, x2, y1, y2, X1, midX, Y1, midY, vertexX * 2 + 1, vertexY * 2 + 1);
+            }else{
+                modify(x1, x2, y1, midY, X1, midX, Y1, midY, vertexX * 2 + 1, vertexY * 2 + 1);
+                modify(x1, x2, midY + 1, y2, X1, midX, midY + 1, Y2, vertexX * 2 + 1, vertexY *2 + 2);
+            }
+        }
+        else{
+            if (midY < y1){
+                modify(x1, midX, y1, y2, X1, midX, midY + 1, Y2, vertexX * 2 + 1, vertexY * 2 + 2);
+                modify(midX + 1, x2, y1, y2, midX + 1, X2, midY + 1, Y2, vertexX * 2 + 2, vertexY * 2 + 2);
+            }else if (midY >= y2){
+                modify(x1, midX, y1, y2,  X1, midX, Y1, midY, vertexX * 2 + 1, vertexY * 2 + 1);
+                modify(midX + 1, x2, y1, y2, midX + 1, X2, Y1, midY, vertexX * 2 + 2, vertexY * 2 + 1);
+            }else{
+                modify(midX + 1, x2, y1, midY, midX + 1, X2, Y1, midY, vertexX * 2 + 2, vertexY * 2 + 1);
+                modify(x1, midX, midY + 1, y2, X1, midX, midY + 1, Y2, vertexX * 2 + 1, vertexY *2 + 2);
+                modify(midX + 1, x2, midY + 1, y2, midX + 1, X2, midY + 1, Y2, vertexX * 2 + 2, vertexY * 2 + 2);
+                modify(x1, midX, y1, midY, X1, midX, Y1, midY, vertexX * 2 + 1, vertexY * 2 + 1);
+            }
+        }
+    }
+
+} SegmentTree;
+
+class Solution {
+public:
+    int rectangleArea(vector<vector<int>>& rectangles) {
+        set<int> xSet, ySet;
+        for (auto &rect: rectangles){
+            if (rect[0] >= rect[2] || rect[1] >= rect[3]) continue;
+            xSet.insert(rect[0]);
+            ySet.insert(rect[1]);
+            xSet.insert(rect[2]);
+            ySet.insert(rect[3]);
+        }
+        if (xSet.size() == 0 || ySet.size() == 0) return 0;
+        SegmentTree segTree(500, 500);
+        cout << segTree.count.size() << " " << segTree.count[1].size() << endl;
+        int i(1), j(1);
+        for (auto &a: xSet){
+            segTree.dictX[a] = i;
+            segTree.dictXr[i] = a;
+            i++;
+        }
+        for (auto &a: ySet){
+            segTree.dictY[a] = j;
+            segTree.dictYr[j] = a;
+            j++;
+        }
+        for (auto &rect: rectangles){
+            if (rect[0] >= rect[2] || rect[1] >= rect[3]) continue;
+            // cout << rect[1] << " " << rect[3] - 1 << endl;
+            segTree.modify(segTree.dictX[rect[0]], segTree.dictX[rect[2] ] - 1, segTree.dictY[rect[1]], segTree.dictY[rect[3]] - 1, 1, xSet.size(), 1, ySet.size(), 0, 0);
+            // cout << segTree.count[0][0] << endl;
+            // for (auto &a: segTree.count) {for (auto &b : a) cout << b << " "; cout << endl;}
+        }
+        
+        return segTree.count[0][0];
+    }
+};
