@@ -11,3 +11,5 @@ Use array much faster than vector
 ### Use template algorithm for competitive programming
 
 ### If much branch, try to draw it out
+
+### Think about set or multiset
