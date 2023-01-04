@@ -1,0 +1,18 @@
+class Solution {
+public:
+    int countVowelPermutation(int n) {
+        int dp[n][5], mod(1e9 + 7), ans(0);
+        memset(dp, 0, sizeof(dp));
+        for (int i = 0; i < 5; ++i) dp[0][i] = 1;
+        for (int j = 1; j < n; ++j){
+            int i(j - 1);
+            dp[j][0] = ((dp[i][1] + dp[i][2]) % mod + dp[i][4]) % mod;
+            dp[j][1] = (dp[i][0] + dp[i][2]) % mod;
+            dp[j][2] = (dp[i][1] + dp[i][3]) % mod;
+            dp[j][3] = dp[i][2];
+            dp[j][4] = (dp[i][2] + dp[i][3]) % mod;
+        }
+        for (int i = 0; i < 5; ++i) (ans += dp[n - 1][i]) %= mod;
+        return ans;
+    }
+};
