@@ -1,0 +1,26 @@
+class Solution {
+public:
+    int candy(vector<int>& ratings) {
+        if (ratings.size() == 1) return 1;
+        int left[ratings.size()], right[ratings.size()], ptr(1), ans(0);
+        memset(left, 0, sizeof(left));
+        memset(right, 0, sizeof(right));
+
+        while (ptr != ratings.size()){
+            if (ratings[ptr] > ratings[ptr - 1]) left[ptr] = left[ptr - 1] + 1;
+            ptr++;
+        }
+        ptr -= 2;
+        while (ptr >= 0){
+            if (ratings[ptr] > ratings[ptr + 1]) right[ptr] = right[ptr + 1] + 1;
+            ptr--;
+        }
+        ptr++;
+        while (ptr != ratings.size()){
+            // cout << left[ptr] << " " << right[ptr] << endl;
+            ans += max(left[ptr], right[ptr]) + 1;
+            ptr++;
+        }
+        return ans;
+    }
+};
