@@ -1,0 +1,171 @@
+class Solution {
+public:
+    vector<int> maxNumber(vector<int>& nums1, vector<int>& nums2, int k) {
+        deque<pair<int,int>> n1(createMonotone(nums1)), n2(createMonotone(nums2));
+        list<vector<int>> ans(merge(n1, n2));
+        // for (auto &a: ans) cout << a[0] << " " << a[1] << " " << a[2] << endl;
+        // cout << ans.size() << endl;
+        if (ans.size() < k){
+            return goUp(ans, k, nums1, nums2);
+        }else if (ans.size() > k){
+            return goDown(ans, k);
+        }else{
+            vector<int> tmp;
+            for (auto &a: ans) tmp.push_back(a[0]);
+            return tmp;
+        }
+    }
+    deque<pair<int, int>> createMonotone(const vector<int>& nums){
+        deque<pair<int, int>> tmp;
+        tmp.push_back({nums[0], 0});
+        for (auto it = nums.begin() + 1; it != nums.end(); it++){
+            while (!tmp.empty() && tmp.back().first < *it) tmp.pop_back();
+            tmp.push_back({*it, it - nums.begin()});
+        }
+        return move(tmp);
+    }
+
+    list<vector<int>> merge(deque<pair<int, int>>& n1, deque<pair<int, int>>& n2){
+        list<vector<int>> tmp;
+        while (!n1.empty() && !n2.empty()){
+            if (n1.front().first >= n2.front().first){
+                tmp.push_back({n1.front().first, n1.front().second, 1});
+                n1.pop_front();
+            }else{
+                tmp.push_back({n2.front().first, n2.front().second, 2});
+                n2.pop_front();
+            }
+        }
+        while (!n1.empty()){
+            tmp.push_back({n1.front().first, n1.front().second, 1});
+            n1.pop_front();
+        }
+        while (!n2.empty()){
+            tmp.push_back({n2.front().first, n2.front().second, 2});
+            n2.pop_front();
+        }
+        return tmp;
+    }
+
+    vector<int> goDown(list<vector<int>>& ans, int k){
+        auto it = ans.end();
+        while (ans.size() > k){
+            ans.erase(prev(it));
+            it = ans.end();
+        }
+        vector<int> tmp;
+        for (auto &a: ans) tmp.push_back(a[0]);
+        return tmp;
+    }
+
+    vector<int> goUp(list<vector<int>> &ans, int k, vector<int>& nums1, vector<int>& nums2){
+        auto it = ans.end();
+        it = prev(it); 
+        auto it2 = it;
+        auto prv = prev(it);
+        auto prv2 = prv;
+        while (ans.size() < k){
+            for (auto &a: ans) cout << a[0] << " " << a[1] << " " << a[2] << "|";
+            cout << ans.size() << endl;
+            cout << (*it)[1] << (*it)[2] << endl;
+            // cout << (*prv)[1] << (*prv)[2] << endl;
+            if (it == ans.begin()){
+                auto &nums = ((*it)[2] == 1? nums1: nums2);
+                auto index = 0;
+                vector<int> localMax({nums[index], index, (*it)[2]});
+                index++;
+                for (; index < (*it)[1]; index++)
+                    if (nums[index] > localMax[0]) localMax = {nums[index], index, (*it)[2]};
+                prv = ans.insert(it, localMax);
+                continue;
+            }
+            if ((*it)[2] == (*prv)[2]){
+                if ((*it)[1] > ((*prv)[1]) + 1){
+                    auto index = (*prv)[1] + 1;
+                    auto &nums = ((*it)[2] == 1? nums1: nums2);
+                    vector<int> localMax({nums[index], index, (*it)[2]});
+                    index++;
+                    for (; index < (*it)[1]; index++)
+                        if (nums[index] > localMax[0]) localMax = {nums[index], index, (*it)[2]};
+                    prv = ans.insert(it, localMax);        
+                }else{
+                    it = prev(it);
+                    prv = prev(prv);
+                }
+            }else{
+                it2 = prv;
+                int index, index2;
+                if (it2 == ans.begin()){
+                    index = 0;
+                    index2 = 0;
+                }else{
+                    prv = prev(prv);
+                    prv2 = prv;
+                    while (prv != ans.begin()){
+                        if ((*prv)[2] != (*it)[2]) prv = prev(prv);
+                        else {
+                            index = (*prv)[1] + 1;
+                            break;
+                        }
+                    }
+                    if ((*prv)[2] != (*it)[2]) index = 0;
+                    else index = (*prv)[1] + 1;
+
+                    while (prv2 != ans.begin()){
+                        if ((*prv2)[2] != (*it2)[2]) prv2 = prev(prv2);
+                        else {
+                            index2 = (*prv2)[1] + 1;
+                            break;
+                        }
+                    }
+                    if ((*prv2)[2] != (*it2)[2]) index2 = 0;
+                    else index2 = (*prv2)[1] + 1;
+                }
+                vector<int> localMax, localMax2;
+                if (index < (*it)[1]){
+                    auto &nums = ((*it)[2] == 1? nums1: nums2);
+                    localMax = {nums[index], index, (*it)[2]};
+                    index++;
+                    for (; index < (*it)[1]; index++)
+                        if (nums[index] > localMax[0]) localMax = {nums[index], index, (*it)[2]};
+                }
+                if (index2 < (*it2)[1]){
+                    auto &nums = ((*it2)[2] == 1? nums1: nums2);
+                    localMax2 = {nums[index2], index2, (*it2)[2]};
+                    index2++;
+                    for (; index2 < (*it2)[1]; index2++)
+                        if (nums[index2] > localMax2[0]) localMax2 = {nums[index2], index2, (*it2)[2]};
+                }
+
+                // cout << (*prv)[1] << (*prv)[2] << endl;
+                // cout << (*prv2)[1] << (*prv2)[2] << endl;
+
+
+                if (!localMax.empty() && !localMax2.empty()){
+                    if (localMax[0] > localMax2[0]) {
+                        prv = ans.insert(it, localMax);
+                        it = next(prv);
+                    }
+                    else {
+                        if ((*it)[0] == (*it2)[0]) iter_swap(it, it2);
+                        prv = ans.insert(it, localMax2);
+                        it = next(prv);
+                    }
+                }else if (!localMax2.empty()){
+                    if ((*it)[0] == (*it2)[0]) iter_swap(it, it2);
+                    prv = ans.insert(it, localMax2);
+                    it = next(prv);
+                }else if (!localMax.empty()){
+                    prv = ans.insert(it, localMax);
+                    it = next(prv);
+                }else{
+                    it = prev(it);
+                    prv = prev(it);
+                }
+            }
+        }
+        vector<int> tmp;
+        for (auto &a: ans) tmp.push_back(a[0]);
+        return tmp;    
+    }
+};
