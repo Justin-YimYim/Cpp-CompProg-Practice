@@ -1,0 +1,64 @@
+class Solution {
+public:
+    using pii = pair<int, int>;
+    vector<int> smVec, countSame;
+    vector<pii> tmp;
+    int createSortedArray(vector<int>& instructions) {
+        smVec.resize(instructions.size());
+        countSame.resize(instructions.size());
+        tmp.resize(instructions.size());
+        vector<pii> vec;
+        for (int i = 0; i < instructions.size(); ++i) vec.push_back({instructions[i], i});
+        mergeSort(vec, 0, instructions.size() - 1);
+        int ans(0), count(0), mod(1e9 + 7);
+        for (int i = 1; i < vec.size(); ++i) {
+            if (vec[i].first == vec[i - 1].first){
+                count++;
+                countSame[vec[i].second] = count;
+            }else count = 0;
+        }
+        for (int i = 1; i < smVec.size(); ++i) {
+            (ans += min(i - smVec[i] - countSame[i], smVec[i])) %= mod; 
+        }
+        return ans;
+    }
+
+    void mergeSort(vector<pii>& vec, int left, int right){
+        if (left == right) return;
+        int mid((right + left) / 2);
+        mergeSort(vec, left, mid);
+        mergeSort(vec, mid + 1, right);
+        merge(vec, left, mid, right);
+    }
+    void merge(vector<pii> &vec, int left, int mid, int right){
+        int ptr(left), ptr1(mid + 1), ptrTmp(left);
+        while (ptr <= mid && ptr1 <= right){
+            if (vec[ptr].first <= vec[ptr1].first){
+                tmp[ptrTmp] = vec[ptr];
+                ptr++;
+                ptrTmp++;
+            }else{
+                tmp[ptrTmp] = vec[ptr1];
+                smVec[vec[ptr1].second] += (mid - ptr + 1);
+                ptr1++;
+                ptrTmp++;
+            }
+        }
+        while (ptr <= mid){
+            tmp[ptrTmp] = vec[ptr];
+            ptr++;
+            ptrTmp++;
+        }
+
+        while (ptr1 <= right){
+            tmp[ptrTmp] = vec[ptr1];
+            ptr1++;
+            ptrTmp++;
+        }
+        ptr = left;
+        while (ptr <= right){
+            vec[ptr] = tmp[ptr];
+            ptr++;
+        }
+    }
+};
