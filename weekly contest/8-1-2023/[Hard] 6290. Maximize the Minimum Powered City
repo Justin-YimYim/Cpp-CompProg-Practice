@@ -1,0 +1,75 @@
+typedef struct SegmentTreeMin{
+    vector<int> minVal, lazyTag;
+    SegmentTreeMin(int n): minVal(n * 4, 0), lazyTag(n * 4, 0){}
+
+    void propogateRoot(int vertex){
+        if (vertex == 0){
+            minVal[vertex] = min(minVal[vertex * 2 + 1], minVal[vertex * 2 + 2]);
+            return;
+        }else {
+            vertex = (vertex - 1) / 2;
+            minVal[vertex] = min(minVal[vertex * 2 + 1], minVal[vertex * 2 + 2]);
+            propogateRoot(vertex);
+        }
+    }
+
+    void add(int l, int r, int L, int R, int vertex, int value, int lazy){
+        if (l == L && r == R) {
+            minVal[vertex] += lazy + value;
+            lazyTag[vertex] += value;
+            if (vertex != 0) propogateRoot(vertex);
+            return;
+        }
+        int mid((L + R) / 2);
+        lazy += lazyTag[vertex];
+        if (mid < l) add(l, r, mid + 1, R, vertex * 2 + 2, value, lazy);
+        else if (mid >= r) add(l, r, L, mid, vertex * 2 + 1, value, lazy);
+        else {
+            add(l, mid, L, mid, vertex * 2 + 1, value, lazy);
+            add(mid + 1, r, mid + 1, R, vertex * 2 + 2, value, lazy);
+        }
+    }
+    
+    int queryMin(int L, int R, int vertex){
+        if (L == R) return L;
+        int mid((L + R) / 2);
+        if (minVal[vertex * 2 + 2] > minVal[vertex * 2 + 1]) return queryMin(L, mid, vertex * 2 + 1);
+        else return queryMin(mid + 1, R, vertex * 2 + 2);
+    }
+} SegmentTree;
+
+class Solution {
+public:
+    long long maxPower(vector<int>& stations, int r, int k) {
+        if (stations.size() == 1) return stations[0] + k;
+        int preSum(0);
+        for (auto &a: stations) a = preSum += a;
+        SegmentTree tree(stations.size());
+        for (int i = 0; i < stations.size(); ++i){
+            int left(max(-1, i - r - 1));
+            int right(min(int(stations.size() - 1), i + r));
+            int current;
+            if (left == -1) current = stations[right];
+            else current = stations[right] - stations[left];
+            tree.add(i, i, 0, stations.size() - 1, 0, current, 0);
+        }
+        for (auto &a: stations) cout << a << " ";
+        cout << endl; 
+        int right(min(r * 2, int(stations.size() - 1)));
+        int left(max(0, int(stations.size() - 1) - r * 2));
+        for (; k > 0; --k){
+            for (auto &a: tree.minVal) cout << a << " ";
+            for (auto &a: tree.lazyTag) cout << a << " ";
+            cout << endl;
+            int currentMin(tree.queryMin(0, stations.size() - 1, 0));
+            cout << currentMin << endl;
+            if (currentMin <= r) tree.add(0, right, 0, stations.size() - 1, 0, 1, 0);
+            else if (currentMin >= stations.size() - 1 - r) tree.add(left, stations.size() - 1, 0, stations.size() - 1, 0, 1, 0);
+            else tree.add(currentMin - r, currentMin + r, 0, stations.size() - 1, 0, 1, 0);
+        }
+        for (auto &a: tree.minVal) cout << a << " ";
+        for (auto &a: tree.lazyTag) cout << a << " ";
+        cout << endl;
+        return tree.minVal[0];
+    }
+};
