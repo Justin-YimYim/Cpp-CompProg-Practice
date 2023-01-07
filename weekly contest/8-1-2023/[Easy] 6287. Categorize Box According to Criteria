@@ -1,0 +1,14 @@
+class Solution {
+public:
+    string categorizeBox(int length, int width, int height, int mass) {
+        bool isHeavy(false), isBulk(false);
+        if (mass >= 100) isHeavy = true;
+        if (length >= 1e4 || width >= 1e4 || height >= 1e4) isBulk = true;
+        long long vol(1LL * length * width * height);
+        if (vol >= 1e9) isBulk = true;
+        if (isBulk && isHeavy) return "Both";
+        else if (isBulk) return "Bulky";
+        else if (isHeavy) return "Heavy";
+        else return "Neither";
+    }
+};
