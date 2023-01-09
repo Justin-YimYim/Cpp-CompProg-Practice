@@ -1,0 +1,27 @@
+class Solution {
+public:
+    int maximumTastiness(vector<int>& price, int k) {
+        sort(price.begin(), price.end());
+        int low(0), high(*price.rbegin()), ans(0);
+        while (low <= high){
+            int mid((low + high) / 2);
+            if (searchAns(price, k, mid)) {
+                ans = mid;
+                low = mid + 1;
+            }
+            else high = mid - 1;
+        }
+        return ans;
+    }
+
+    bool searchAns(vector<int> &price, int k, int answer){
+        auto ptr(price.begin());
+        while (k > 1){
+            ptr = lower_bound(ptr, price.end(), *ptr + answer);
+            if (ptr == price.end()) return false;
+            k--;
+        }
+        if (ptr != price.end()) return true;
+        else return false;
+    }
+};
