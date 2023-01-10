@@ -1,0 +1,47 @@
+class Solution {
+public:
+    vector<vector<int>> finalAns;
+    vector<vector<string>> solveNQueens(int n) {
+        vector<int> possible(n, (1 << n) - 1);
+        vector<int> ans;
+        cal(ans, possible, 0);
+        vector<vector<string>> solutions;
+        for (auto &sol: finalAns){
+            vector<string> solution;
+            for (auto &a: sol){
+                string row;
+                for (int i = 0; i < n; ++i) if (i == a - 1) row += 'Q'; else row += '.';
+                solution.push_back(row);
+            }
+            solutions.push_back(solution);
+        }
+        return solutions;
+    }
+
+    void cal(vector<int> ans, vector<int> possible, int k){
+        if (possible.size() == k) return finalAns.push_back(ans);
+        if (possible[k] == 0) return;
+        for (auto &a: countBit(possible[k])){
+            vector<int> tmp(possible);
+            for (int j = k + 1; j < tmp.size(); ++j){
+                tmp[j] &= (1 << possible.size()) - 1 - (1 << (a - 1));
+                tmp[j] &= (1 << possible.size()) - 1 - (a - (j - k) > 0? 1 << (a - (j - k) - 1) : 0);
+                tmp[j] &= (1 << possible.size()) - 1 - (a + (j - k) > 0? 1 << (a + (j - k) - 1) : 0);
+            }
+            ans.push_back(a);
+            cal(ans, tmp, k + 1);
+            ans.pop_back();
+        }
+    }
+
+    vector<int> countBit(int bit){
+        vector<int> tmp;
+        int count(1);
+        while (bit > 0){
+            if (bit & 1) tmp.push_back(count);
+            count++;
+            bit >>= 1;
+        }
+        return tmp;
+    }
+};
