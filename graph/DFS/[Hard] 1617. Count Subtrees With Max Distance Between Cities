@@ -1,0 +1,46 @@
+class Solution {
+public:
+    vector<int> countSubgraphsForEachDiameter(int n, vector<vector<int>>& edges) {
+        unordered_map<int, set<int>> graph;
+        vector<int> ans(n - 1, 0);
+        for (auto &edge: edges) {
+            graph[edge[0]].insert(edge[1]);
+            graph[edge[1]].insert(edge[0]);
+        }
+
+        for (int i = 1; i <= (1 << n) - 1; ++i){
+            set<int> tmp(getBit(i));
+            int distanceMax(0);
+            int length(dfs(tmp, graph, *tmp.begin(), 0, distanceMax));
+            if (tmp.empty()){
+                if (distanceMax != 0) ans[distanceMax - 1]++;
+            }
+        }
+        return ans;
+    }
+
+    set<int> getBit(int bit){
+        set<int> tmp;
+        int count(1);
+        while (bit > 0){
+            if (bit & 1) tmp.insert(count);
+            count++;
+            bit >>= 1;
+        }
+        return tmp;
+    }
+
+    int dfs(set<int>& tmp, unordered_map<int, set<int>>& graph, int current, int depth, int& distanceMax){
+        priority_queue<int> countCurrent;
+        tmp.erase(current);
+        int a(-1), b(-1);
+        for (auto &a: graph[current]){
+            if (tmp.find(a) != tmp.end()) countCurrent.push(dfs(tmp, graph, a, depth + 1, distanceMax));
+        }
+        if (countCurrent.empty()) return 0;
+        else {a = countCurrent.top(); countCurrent.pop();}
+        if (!countCurrent.empty()){b = countCurrent.top(); countCurrent.pop();}
+        distanceMax = max(a + b + 2, distanceMax);
+        return a + 1;
+    }
+};
