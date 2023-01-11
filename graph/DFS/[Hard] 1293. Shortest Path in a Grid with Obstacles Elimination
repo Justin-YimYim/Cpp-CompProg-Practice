@@ -1,0 +1,42 @@
+class Solution {
+public:
+    vector<vector<vector<int>>> dp;
+    int x, y;
+    int shortestPath(vector<vector<int>>& grid, int k) {
+        k = min(int(grid.size() + grid[0].size()), k);
+        dp.resize(k + 1, vector<vector<int>>(grid.size(), vector<int>(grid[0].size(), INT_MAX)));
+        x = grid.size() - 1;
+        y = grid[0].size() - 1;
+        // cout << x << " " << y << endl;
+        for (int i = 0; i < k; ++i){
+            dp[i][0][0] = 0;
+        }
+        dfs(grid, k, 1, {0, 0});
+        int ans(INT_MAX);
+        for (int i = 0; i <= k; ++i){
+            ans = min(dp[i][grid.size() - 1][grid[0].size() - 1], ans);
+        }
+        // for (auto &a: dp) {for (auto &b: a){ for (auto &c: b) cout << c << ends; cout << endl; } cout << endl;}
+        // cout << endl;
+        if (ans == INT_MAX) return -1;
+        else return ans;
+    }
+
+    void dfs(vector<vector<int>> &grid, int k, int step, pair<int, int> crt){
+        pair<int, int> up({crt.first, max(0, crt.second - 1)}), down({crt.first, min(y, crt.second + 1)}), left({max(0, crt.first - 1), crt.second}), right({min(x, crt.first + 1), crt.second});
+
+        for (auto &a: {up, down, left, right}){
+            if (a != crt){
+                if (grid[a.first][a.second] == 1) {
+                    if (k != 0 && dp[k - 1][a.first][a.second] > step){
+                        dp[k - 1][a.first][a.second] = step;
+                        dfs(grid, k - 1, step + 1, a);
+                    }
+                }else if (dp[k][a.first][a.second] > step){
+                    dp[k][a.first][a.second] = step;
+                    dfs(grid, k, step + 1, a);
+                }
+            }
+        }
+    }
+};
