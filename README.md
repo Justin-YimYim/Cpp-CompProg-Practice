@@ -13,3 +13,5 @@ Use array much faster than vector
 ### If much branch, try to draw it out
 
 ### Think about set or multiset
+
+### always use long long for hard question &&& Use long long with LLONG_MAX
