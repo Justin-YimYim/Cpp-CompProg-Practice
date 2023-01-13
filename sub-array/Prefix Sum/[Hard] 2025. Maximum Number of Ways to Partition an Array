@@ -1,0 +1,25 @@
+class Solution {
+public:
+    int waysToPartition(vector<int>& nums, int k) { 
+        #define int long       
+        int prefixSum(0), ans(0);
+        vector<int> preSum(nums.size());
+        unordered_map<int, int> dict;
+        for (int i = 0; i < nums.size(); ++i) preSum[i] = prefixSum += nums[i];
+        for (auto &a: preSum) {
+            a = 2 * a - prefixSum;
+            dict[a]++;
+        }
+        dict[*preSum.rbegin()]--;
+        for (auto &a: dict) cout << a.first << " " << a.second << endl;
+        for (int i = 0; i < nums.size(); ++i) {
+            int increase(k - nums[i]);
+            ans = max(ans, dict[-increase]);
+            dict[preSum[i]]--;
+            dict[-preSum[i]]++;
+        }
+        if (dict.find(0) != dict.end()) ans = max(ans, dict[0]);
+        #undef int 
+        return ans;
+    }
+};
