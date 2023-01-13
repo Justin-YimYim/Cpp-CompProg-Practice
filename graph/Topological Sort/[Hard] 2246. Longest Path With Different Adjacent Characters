@@ -1,0 +1,64 @@
+class Solution {
+public:
+    int longestPath(vector<int>& parent, string s) {
+        if (parent.size() == 1) return 1;
+        int n(parent.size()), ans(0);
+        vector<int> layer(n, -1);
+        layer[0] = 0;
+        map<int, vector<pair<int, int>>> prtChild;
+        vector<priority_queue<int>> shortestPath(n);
+        for (int i = 1; i < parent.size(); i++){
+            if (layer[i] == -1 && parent[i] != - 1){
+                layer[i] = dfs(parent, layer, i);
+            }
+        }
+        for (int i = 0; i < parent.size(); ++i){
+            prtChild[layer[i]].push_back({parent[i], i});
+        }
+        auto it2 = prev(prtChild.rend());
+        for (auto it = prtChild.rbegin(); it != it2; ++it){
+            for (auto &pii: (*it).second){
+                if (s[pii.first] != s[pii.second]){
+                int k(1), j(0);
+                if (!shortestPath[pii.second].empty()){
+                    k = shortestPath[pii.second].top() + 1;
+                    shortestPath[pii.first].push(k);
+                    shortestPath[pii.second].pop();
+                }else shortestPath[pii.first].push(1);
+
+                if (!shortestPath[pii.second].empty()){
+                    j = shortestPath[pii.second].top();;
+                }
+                ans = max(ans, k + j);
+                }
+                else{
+                    int k(1), j(0);
+                    if (!shortestPath[pii.second].empty()){
+                        k = shortestPath[pii.second].top() + 1;
+                        shortestPath[pii.second].pop();
+                    }
+                    if (!shortestPath[pii.second].empty()){
+                        j = shortestPath[pii.second].top();;
+                    }
+                    ans = max(ans, k + j);
+                }
+            }
+        }
+        int k(1), j(0);
+        if (!shortestPath[0].empty()){
+            k = shortestPath[0].top() + 1;
+            shortestPath[0].pop();
+        }
+        if (!shortestPath[0].empty()){
+            j = shortestPath[0].top();;
+        }
+        ans = max(ans, k + j);
+
+        return ans;
+    }
+
+    int dfs(vector<int> &parent, vector<int>& layer, int crt){
+        if (parent[crt] != -1 && layer[crt] == -1) layer[crt] = dfs(parent, layer, parent[crt]) + 1;
+        return layer[crt];
+    }
+};
