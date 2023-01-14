@@ -1,0 +1,57 @@
+class Solution {
+public:
+    vector<vector<string>> ans;
+    vector<vector<string>> findLadders(string beginWord, string endWord, vector<string>& wordList) {
+        map<string, vector<string>> dict;
+        unordered_map<string, int> walked;
+        bool isExist(false);
+        for (int i = 0; i < wordList.size(); ++i){
+            walked[wordList[i]] = INT_MAX;
+            if (wordList[i] == endWord) isExist = true;
+            for (int j = 0; j < wordList.size(); ++j){
+                if (i == j) continue;
+                if (checkSame(wordList[i], wordList[j])) dict[wordList[i]].push_back(wordList[j]);
+            }
+        }
+        if (isExist == false) {};
+        if (dict.find(beginWord) == dict.end()) for (int i = 0; i < wordList.size(); ++i) if (checkSame(beginWord, wordList[i])) dict[beginWord].push_back(wordList[i]);
+        walked[beginWord] = 0;
+        queue<pair<vector<string>, int>> q;
+        q.push({{beginWord}, 1});
+        bfs(endWord, walked, dict, q);
+        return ans;
+    }
+    bool checkSame(string& s1, string& s2){
+        bool isSame(true);
+        for (int i = 0; i < s1.size(); ++i){
+            if (s1[i] != s2[i] && isSame) isSame = false;
+            else if (s1[i] != s2[i]) return false;
+        }
+        return true;
+    }
+
+    void bfs(string& endWord, unordered_map<string, int> walked, map<string, vector<string>> &dict, queue<pair<vector<string>, int>> &q){
+        int last(-1);
+        while (!q.empty()){
+            auto crt = q.front();
+            if (last != -1 && crt.second > last) return;
+            q.pop();
+            auto& nxtNode = dict[*(crt.first.rbegin())];
+            for (auto &node: nxtNode){
+                if (node == endWord) {
+                    last = crt.second; 
+                    crt.first.push_back(node);
+                    ans.push_back(crt.first); 
+                    break;
+                }
+                if (walked[node] >= crt.second + 1){
+                    auto tmp = crt;
+                    tmp.first.push_back(node);
+                    tmp.second++;
+                    walked[node] = tmp.second;
+                    q.push(tmp);
+                }
+            }
+        }
+    }
+};
