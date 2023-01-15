@@ -1,0 +1,35 @@
+class Solution {
+public:
+    long long maxOutput(int n, vector<vector<int>>& edges, vector<int>& price) {
+        long long dp[n][n];
+        for (int i = 0; i < n; ++i){
+            for (int j = 0; j < n; ++j){
+                if (i == j)
+                    dp[i][j] = 0;
+                else dp[i][j] = 10L * INT_MAX ;
+            }
+        }
+        for (auto &edge: edges){
+            dp[edge[0]][edge[1]] = price[edge[1]];
+            dp[edge[1]][edge[0]] = price[edge[0]];
+        }
+        
+        for (int k = 0; k < n; ++k){
+            for (int i = 0; i < n; ++i){
+                for (int j = 0; j < n; ++j){
+                    dp[i][j] = min(dp[i][j], dp[i][k] + dp[k][j]);
+                }
+            }
+        }
+        // for (auto &a: dp) {for (auto &b: a) cout << b << " "; cout <<endl;}
+        long long ans(INT_MIN);
+        for (int i = 0; i < n; ++i){
+            long long tmp(LLONG_MIN);
+            for (int j = 0; j < n; ++j){
+                tmp = max(tmp, dp[i][j]);
+            }
+            ans = max(ans, tmp - dp[i][i]);
+        }
+        return ans;
+    }
+};
