@@ -1,0 +1,14 @@
+class Solution {
+public:
+    int differenceOfSum(vector<int>& nums) {
+        int sum1(0), sum2(0);
+        for (auto &a: nums){
+            sum1 += a;
+            while (a > 0){
+                sum2 += a % 10;
+                a  /= 10;
+            }
+        }
+        return abs(sum1 - sum2);
+    }
+};
