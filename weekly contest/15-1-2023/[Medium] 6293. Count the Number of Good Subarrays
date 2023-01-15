@@ -1,0 +1,30 @@
+class Solution {
+public:
+    long long countGood(vector<int>& nums, int k) {
+        int ptr1(0), ptr2(1), count(0);
+        long long ans(0);
+        map<int, int> dict;
+        dict[nums[0]]++;
+        while (ptr2 < nums.size()){
+            if (dict.find(nums[ptr2]) != dict.end()) count += dict[nums[ptr2]];
+            dict[nums[ptr2]]++;
+            if (count >= k) {
+                ans += nums.size() - ptr2;
+                while (ptr1 <= ptr2 && count >= k){
+                    dict[nums[ptr1]]--;
+                    if (dict[nums[ptr1]] > 0) count -= dict[nums[ptr1]];
+                    ptr1++;
+                    if (count >= k) ans += nums.size() - ptr2;
+                }
+            }
+            ptr2++;
+        }
+        while (ptr1 <= ptr2 && count >= k){
+            dict[nums[ptr1]]--;
+            if (dict[nums[ptr1]] > 0) count -= dict[nums[ptr1]];
+            ptr1++;
+            if (count >= k) ans++;
+        }
+        return ans;
+    }
+};
