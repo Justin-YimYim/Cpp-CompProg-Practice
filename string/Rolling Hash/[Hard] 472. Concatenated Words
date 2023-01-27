@@ -1,0 +1,38 @@
+class Solution {
+public:
+    long long mod;
+    vector<string> findAllConcatenatedWordsInADict(vector<string>& words) {
+        unordered_set<long long> hash;
+        mod = 1e9 + 7;
+        for (auto &wd: words) hash.insert(hashing(wd));
+        vector<string> ans;
+        for (auto &wd: words) {
+            vector<long long> tmp{0};
+            for (int i = 0; i < wd.size(); ++i){
+                if (i != wd.size() - 1){
+                    bool flag(false);
+                    for (auto &pos: tmp){
+                        pos = (pos * 26 + wd[i]) % mod;
+                        if (hash.find(pos) != hash.end()) flag = true;
+                    }
+                    if (flag) tmp.push_back(0);
+                }else{
+                    for (auto pos = 1; pos < tmp.size(); pos++){
+                        long hashed((tmp[pos] * 26 + wd[i]) % mod);
+                        if (hash.find(hashed) != hash.end()){
+                            ans.push_back(wd);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return ans;
+    }
+
+    long long hashing(string& word){
+        long long tmp = 0;
+        for (auto &ch: word) tmp = (tmp * 26 + int(ch)) % mod;
+        return tmp;
+    }
+};
