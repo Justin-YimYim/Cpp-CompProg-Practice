@@ -1,0 +1,70 @@
+class Solution {
+public:
+    bool walked[12];
+    bool image[12];
+    int furthest;
+    int currentFurthest;
+    int shortestPathLength(vector<vector<int>>& graph) {
+        int depth = 0;
+        furthest = 0;
+        vector<bool> tmpWalked(12, false);
+        for (int i = 0; i < graph.size(); ++i) {
+            tmpWalked[i] = true;
+            depth = max(dfs(tmpWalked, graph, i, 1), depth);
+            tmpWalked[i] = false;
+        }
+        furthest--;
+        queue<int> q;
+        for (int i = 0; i < 12; i++) if(walked[i]) q.push(i);
+        while (!q.empty()){
+            for (int i = 0; i < 12; ++i) {
+                tmpWalked[i] = walked[i];
+                image[i] = walked[i];
+            }
+            int start = q.front();
+            q.pop();
+            for (auto &a: graph[start]) if (!walked[a]) {
+                currentFurthest = 0;
+                furthest += dfsLongestCircle(tmpWalked, graph, start, a, 1);
+                for (int i = 0; i < graph.size(); ++i) if(image[i] != walked[i]) q.push(i);
+            }
+        }
+        return max(0, furthest);
+    }
+
+    int dfs(vector<bool>& tmpWalked, vector<vector<int>> &graph, int currentNode, int depth){
+        int current(depth);
+        for (auto &adj: graph[currentNode]){
+            if (!tmpWalked[adj]) {
+                tmpWalked[adj] = true;
+                int tmp(dfs(tmpWalked, graph, adj, depth + 1));
+                if (tmp > furthest){
+                    for (int i = 0; i < 12; ++i) walked[i] = tmpWalked[i];
+                    furthest = tmp;
+                }
+                current = max(current, tmp);
+                tmpWalked[adj] = false;
+            }
+        }
+        return current;
+    }
+
+    int dfsLongestCircle(vector<bool> &tmpWalked, vector<vector<int>> &graph, int start, int currentNode, int depth){
+        if (start == currentNode) return depth;
+        else if (tmpWalked[currentNode]) return 0;
+        else{
+            int current(depth);
+            tmpWalked[currentNode] = true;
+            for (auto &adj: graph[currentNode]){
+                int tmp(dfsLongestCircle(tmpWalked, graph, start, adj, depth + 1));
+                if (tmp > currentFurthest){
+                    for (int i = 0; i < 12; ++i) walked[i] = tmpWalked[i];
+                    currentFurthest = tmp;
+                }
+                current = max(current, tmp);
+            }
+            tmpWalked[currentNode] = false;
+            return current;
+        }
+    }
+};
