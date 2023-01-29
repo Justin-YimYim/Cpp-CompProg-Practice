@@ -1,0 +1,19 @@
+class Solution {
+public:
+    int monkeyMove(int n) {
+        n--;
+        long long ans(2), base(2);
+        int mod(1e9 + 7);
+        while (n > 0){
+            if (n % 2 == 0){
+                n /= 2;
+                (base *= base) %= mod;
+            }else{
+                n--;
+                (ans *= base) %= mod; 
+            }
+        }
+
+        return ((ans - 2) + mod) % mod;
+    }
+};
