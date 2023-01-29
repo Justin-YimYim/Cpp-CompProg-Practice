@@ -1,0 +1,72 @@
+class LFUCache {
+public:
+    map<int, list<int>> counter;
+    unordered_map<int, pair<int, int>> cache;
+    int isFull, full;
+    LFUCache(int capacity): isFull(0), full(capacity - 1) {
+    }
+    
+    int get(int key) {
+        // for (auto &a: counter){
+        //     cout << a.first << ":";
+        //     for (auto& b: a.second) cout << b << " ";
+        //     cout << endl;
+        // }
+        // cout << key << endl;
+        if (full == -1) return -1;
+        if (cache.find(key) == cache.end()) return -1;
+        else{
+            auto& tmp = cache[key];
+            counter[tmp.second].erase(find(counter[tmp.second].begin(), counter[tmp.second].end(), key));
+            if (counter[tmp.second].empty()) counter.erase(tmp.second);
+            tmp.second++;
+            counter[tmp.second].push_back(key);
+            // cout << "get:" << tmp.first << endl;
+            // cout << endl;
+            return tmp.first;
+        }
+    }
+    
+    void put(int key, int value) {
+        if (full == -1) return;
+        if (isFull <= full){
+            if (cache.find(key) == cache.end()){
+                cache[key] = {value, 1};
+                isFull++;
+                counter[1].push_back(key);
+            }else{
+                cache[key].first = value;
+                auto& tmp = cache[key].second;
+                counter[tmp].erase(find(counter[tmp].begin(), counter[tmp].end(), key));
+                if (counter[tmp].empty()) counter.erase(tmp);
+                tmp++;
+                counter[tmp].push_back(key);
+            }
+        }
+        else{
+            if (cache.find(key) != cache.end()) {
+                cache[key].first = value;
+                auto& tmp = cache[key].second;
+                counter[tmp].erase(find(counter[tmp].begin(), counter[tmp].end(), key));
+                if (counter[tmp].empty()) counter.erase(tmp);
+                tmp++;
+                counter[tmp].push_back(key);
+            }else{
+                auto& frt = (*counter.begin()).second.front();
+                cache.erase(cache.find(frt));
+                (*counter.begin()).second.pop_front();
+                if ((*counter.begin()).second.empty()) counter.erase(counter.begin());
+                cache[key] = {value, 1};
+                counter[1].push_back(key);
+            }
+        }
+        // cout << isFull << " " << full << endl;
+    }
+};
+
+/**
+ * Your LFUCache object will be instantiated and called as such:
+ * LFUCache* obj = new LFUCache(capacity);
+ * int param_1 = obj->get(key);
+ * obj->put(key,value);
+ */
