@@ -1,0 +1,22 @@
+class Solution {
+public:
+    long long putMarbles(vector<int>& weights, int k) {
+        priority_queue<long long> heap;
+        priority_queue<long long, vector<long long>, greater<long long>> minHeap;
+        long long ans(0);
+        for (int i = 0; i < weights.size() - 1; i++){
+            long long tmp(weights[i] + weights[i + 1]);
+            heap.push(tmp);
+            minHeap.push(tmp); 
+        }
+        k--;
+        while (k > 0){
+            long long tmp(heap.top() - minHeap.top());
+            ans += tmp;
+            heap.pop();
+            minHeap.pop();
+            k--;
+        }
+        return ans;
+    }
+};
