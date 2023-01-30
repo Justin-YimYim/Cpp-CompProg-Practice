@@ -1,0 +1,53 @@
+class Solution {
+public:
+    bool isPrintable(vector<vector<int>>& targetGrid) {
+        unordered_map<int, vector<int>> dict;
+        unordered_map<int, set<int>> layer;
+        set<int> clr;
+        for (int i = 0; i < targetGrid.size(); i++){
+            for (int j = 0; j < targetGrid[0].size(); j++){
+                if (dict.find(targetGrid[i][j]) == dict.end()){
+                    dict[targetGrid[i][j]] = {i, i, j, j};
+                }else{
+                    dict[targetGrid[i][j]][0] = min(dict[targetGrid[i][j]][0], i);
+                    dict[targetGrid[i][j]][1] = max(dict[targetGrid[i][j]][1], i);
+                    dict[targetGrid[i][j]][2] = min(dict[targetGrid[i][j]][2], j);
+                    dict[targetGrid[i][j]][3] = max(dict[targetGrid[i][j]][3], j);
+                }
+            }
+        }
+
+        for (auto &color: dict){
+            clr.insert(color.first);
+            int y1(color.second[0]), y2(color.second[1]), x1(color.second[2]), x2(color.second[3]);
+            for (int i = y1; i <= y2; i++){
+                for (int j = x1; j <= x2; j++){
+                    if (targetGrid[i][j] != color.first){
+                        layer[color.first].insert(targetGrid[i][j]);
+                    }
+                }
+            }
+        }
+
+        while (!layer.empty()){
+            int tmp(-1), flag(0);
+            for (auto &color: clr){
+                if (layer[color].empty()){
+                    for (auto &lay: layer) {
+                        const auto &it = lay.second.find(color);
+                        if (it != lay.second.end()) lay.second.erase(lay.second.find(color));
+                    }
+                    tmp = color;
+                    flag = 1;
+                    layer.erase(layer.find(color));
+                    break;
+                }
+            }
+            const auto& it = clr.find(tmp);
+            if (it != clr.end()) clr.erase(clr.find(tmp));
+            if (flag == 0) return false;
+        }
+
+        return true;
+    }
+};
