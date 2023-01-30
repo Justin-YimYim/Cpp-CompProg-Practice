@@ -7,9 +7,11 @@
 - Intialize
 - Define current state
 - Define ways to transfer => the more way, the more direction dp could be inherit
-### Backward vs Forward
+### Backward vs Forward (same dimension dp)
 - Forward means condition depends on past
 - Backward means condition depends on future
+### Top-down vs bottom up (+1 dimension dp)
+- Used in string (See strange printer)
 ### cherry pick 4 stage
 - ** for loop is hard to do pruning
 - ** while loop is easier
