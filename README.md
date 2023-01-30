@@ -3,7 +3,9 @@
 A record for github practice
 
 ### cpp concept
-Unordered_set cannot work with vector<int>, but set can
+- Unordered_set cannot work with vector<int>, but set can
+- const auto& it = set.find(xxx);
+- if (it != set.end()) set.erase(it);
 
 ### If know size
 Use array much faster than vector
