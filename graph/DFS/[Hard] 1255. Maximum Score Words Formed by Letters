@@ -1,0 +1,58 @@
+class Solution {
+public:
+    int N;
+    int maxScoreWords(vector<string>& words, vector<char>& letters, vector<int>& score) {
+        unordered_map<char, int> dict;
+        vector<unordered_map<char, int>> required(words.size());
+        vector<int> wordScores(words.size(), 0);
+        int ans(0);
+        N = words.size();
+        for (int i = 0; i < words.size(); i++){
+            for (auto &w: words[i]){
+                wordScores[i] += score[w - 'a'];
+                required[i][w]++;
+            }
+        }
+        for (auto &lt: letters){
+            dict[lt]++;
+        }
+
+        dfs(dict, ans, required, wordScores, 0, 0);
+        return ans;
+    }
+
+    void dfs(unordered_map<char, int>& dict, int& ans, vector<unordered_map<char, int>>& required, vector<int>& wordScores, int current, int value){
+        for (int lastBit(findFront(current)); lastBit < N; lastBit++){
+            int tmp(current + (1 << lastBit));
+            if (check(dict, required[lastBit])){
+                unordered_map<char, int> tmpDict(reduce(dict, required[lastBit]));
+                ans = max(ans, value + wordScores[lastBit]);
+                dfs(tmpDict, ans, required, wordScores, tmp, value + wordScores[lastBit]);
+            }
+        }
+    }
+
+    int findFront(int current){
+        int tmp(0);
+        while (current > 0){
+            tmp++;
+            current >>= 1;
+        }
+        return tmp;
+    }
+
+    bool check(unordered_map<char, int>& dict, unordered_map<char, int>& required){
+        for (auto& re: required){
+            if (dict[re.first] < re.second) return false;
+        }
+        return true;
+    }
+
+    unordered_map<char, int> reduce(unordered_map<char, int>& dict, unordered_map<char, int>& required){
+        unordered_map<char, int> tmp(dict);
+        for (auto& re: required){
+            tmp[re.first] -= re.second;
+        }
+        return tmp;
+    }
+};
