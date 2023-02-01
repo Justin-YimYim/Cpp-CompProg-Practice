@@ -1,0 +1,73 @@
+class Solution {
+public:
+    vector<int> longestRepeating(string s, string queryCharacters, vector<int>& queryIndices) {
+        set<int> count;
+        map<int, int> dict;
+        int last(0);
+        count.insert(-1);
+        count.insert(0);
+        for (int i = 1; i < s.size(); ++i){
+            if (s[i] != s[i - 1]) {
+                count.insert(i);
+                dict[i - last]++;
+                last = i;    
+            }
+        }
+        count.insert(s.size());
+        dict[s.size() - last]++;
+        vector<int> ans(queryCharacters.size(), 0);
+
+        for (int i = 0; i < queryCharacters.size(); ++i){
+            // for (auto &a: dict) cout << a.first << ":" << a.second << " ";
+            // cout << endl;
+            // for (auto &a: count) cout << a << " ";
+            // cout << endl;
+            if (queryCharacters[i] == s[queryIndices[i]]) ans[i] = dict.rbegin()->first;
+            else{
+                auto it2 = count.upper_bound(queryIndices[i]);
+                auto it1 = prev(it2);
+                dict[*it2 - *it1]--;
+                if (dict[*it2 - *it1] == 0) dict.erase(dict.find(*it2 - *it1));
+                if (queryIndices[i] - *it1 != 0) dict[queryIndices[i] - *it1]++;
+                dict[1]++;
+                if (*it2 - (queryIndices[i] + 1) != 0) dict[*it2 - queryIndices[i] - 1]++;
+                count.insert(queryIndices[i]);
+                count.insert(queryIndices[i] + 1);
+                s[queryIndices[i]] = queryCharacters[i];
+                it2 = count.lower_bound(queryIndices[i]);
+                it1 = prev(it2);
+                if (*it1 == -1){
+                    it1 = next(it1);
+                    it2 = next(it2);
+                }else{
+                    if (s[*it1] == s[*it2]){
+                        dict[*it2 - *it1]--;
+                        dict[1]--;
+                        if (dict[*it2 - *it1] == 0) dict.erase(dict.find(*it2 - *it1));
+                        if (dict[1] == 0) dict.erase(dict.find(1));
+                        count.erase(it2);
+                        it2 = count.upper_bound(queryIndices[i]);
+                        dict[*it2 - *it1]++;
+                    }else{
+                        it1 = next(it1);
+                        it2 = next(it2);
+                    }
+                }
+
+                if (*it2 != s.size()){
+                    if (s[*it1] == s[*it2]){
+                        dict[*it2 - *it1]--;
+                        if (dict[*it2 - *it1] == 0) dict.erase(dict.find(*it2 - *it1));
+                        dict[*next(it2) - *it2]--;
+                        if (dict[*next(it2) - *it2] == 0) dict.erase(dict.find(*next(it2) - *it2));
+                        count.erase(it2);
+                        it2 = count.upper_bound(queryIndices[i] + 1);
+                        dict[*it2 - *it1]++;
+                    }
+                }
+            }
+            ans[i] = dict.rbegin()->first;
+        }
+        return ans;
+    }
+};
