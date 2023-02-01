@@ -1,0 +1,21 @@
+class Solution {
+public:
+    int maximumsSplicedArray(vector<int>& nums1, vector<int>& nums2) {
+        vector<int> diff(nums1.size(), 0);
+        int sum1(0), sum2(0), posMax(0), posMin(0), tmpMax(0), tmpMin(0);
+        for (int i = 0; i < nums1.size(); ++i){
+            diff[i] = nums2[i] - nums1[i];
+            sum1 += nums1[i];
+            sum2 += nums2[i];
+        }
+
+        for (int i = 0; i < nums1.size(); ++i){
+            tmpMax = max(0, tmpMax + diff[i]);
+            tmpMin = min(0, tmpMin + diff[i]);
+            posMax = max(posMax, tmpMax);
+            posMin = min(tmpMin, posMin);
+        }
+
+        return max(abs(sum1 + posMax), abs(sum2 - posMin));
+    }
+};
