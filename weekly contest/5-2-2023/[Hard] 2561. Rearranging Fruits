@@ -1,0 +1,47 @@
+class Solution {
+public:
+    long long minCost(vector<int>& basket1, vector<int>& basket2) {
+        map<long long, long long> dict, dict1;
+        int smallest(INT_MAX);
+        for (auto &a: basket1) {
+            smallest = min(smallest, a);
+            dict[a]++;
+            dict1[a]++;
+        }
+        for (auto &a: basket2) {
+            dict[a]++;
+            smallest = min(smallest, a);
+        }
+        long long ans(0);
+        long long count(0);
+        for (auto &a: dict) {
+            if (a.second % 2 == 1) return -1;
+            a.second /= 2;
+            if (dict1.find(a.first) != dict1.end()){
+                a.second -= dict1[a.first];
+            }
+            if (a.second < 0){
+                count += abs(a.second);
+            }
+        }
+        for (auto &a: dict){
+            // cout << count << endl;
+            if (a.second == 0) continue;
+            // cout << ans << endl;
+            // cout << count << endl;
+            // cout << a.first << ":" << a.second << endl;
+            if (count > abs(a.second)){
+                ans += abs(min(a.first, 2LL * smallest) * a.second);
+                count -= abs(a.second);
+            }else if (count == 0) {
+                break;
+            }
+            else{
+                ans += abs(min(a.first, 2LL * smallest) * count);
+                count -= abs(count);
+                break;
+            }
+        }
+        return ans;
+    }
+};
