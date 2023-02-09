@@ -1,0 +1,22 @@
+class Solution {
+public:
+    long long distinctNames(vector<string>& ideas) {
+        long long ans(0), hashed, mod(1e9 + 7);
+        unordered_map<char, unordered_set<int>> dict;
+        for (auto &idea: ideas){
+            hashed = 0;
+            for (int i = 1; i < idea.size(); ++i) hashed = hashed * 26 + (idea[i] - 'a' + 1) % mod;
+            dict[idea[0]].insert(hashed);
+        }
+
+        for (auto it = dict.begin(); it != dict.end(); ++it){
+            for (auto it2 = next(it); it2 != dict.end(); ++it2){
+                int mut(0);
+                auto& target = it2->second;
+                for (auto &idea: it->second) if (target.find(idea) != target.end()) mut++;
+                ans += 2 * ((it->second).size() - mut) * (target.size() - mut);
+            }
+        }
+        return ans;
+    }
+};
