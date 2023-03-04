@@ -1,0 +1,26 @@
+class Solution {
+public:
+    int splitNum(int num) {
+        map<int, int> dict;
+        while (num > 0){
+            dict[num % 10]++;
+            num /= 10;
+        }
+        int i(0), j(0), tmp(0);
+        for (auto &pr: dict){
+            while (pr.second > 0){
+                if (tmp == 0){
+                    pr.second--;
+                    i = i * 10 + pr.first;
+                    tmp = 1;
+                }
+                else{
+                    pr.second--;
+                    j = j * 10 + pr.first;
+                    tmp = 0;
+                }
+            }
+        }
+        return i + j;
+    }
+};
