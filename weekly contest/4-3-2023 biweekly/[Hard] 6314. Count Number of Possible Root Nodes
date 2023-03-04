@@ -1,0 +1,52 @@
+class Solution {
+public:
+    int rootCount(vector<vector<int>>& edges, vector<vector<int>>& guesses, int k) {
+        unordered_map<int, set<int>> graph;
+        unordered_map<int, vector<int>> graph2;
+        for (auto &guess: guesses){
+            graph[guess[0]].insert(guess[1]); 
+        }
+        for (auto &edge: edges){
+            graph2[edge[0]].push_back(edge[1]);
+            graph2[edge[1]].push_back(edge[0]);
+        }
+        
+        int correct = 0, ans = 0;
+        dfs(graph, graph2, -1, 0, correct);
+        if (correct >= k) ans++;
+        queue<pair<int, int>> bfs;
+        bfs.push({0, correct});
+        bool flag[edges.size() + 1];
+        memset(flag, 0, sizeof(flag));
+        flag[0] = 1;
+        while (!bfs.empty()){
+            auto current = bfs.front();
+            auto tmp = graph2[current.first];
+            for (auto &next: tmp){
+                if (flag[next] == 1) continue;
+                auto tmp_correct = current.second;
+                if (graph[current.first].find(next) != graph[current.first].end()) tmp_correct--;
+                if (graph[next].find(current.first) != graph[next].end()) tmp_correct++;
+                if (tmp_correct >= k) ans++;
+                bfs.push({next, tmp_correct});
+                flag[next] = 1;
+            }
+            bfs.pop();
+        }
+        return ans;
+    }
+    
+    void dfs(unordered_map<int, set<int>>& guessGraph, unordered_map<int, vector<int>> &graph, int parent, int currentNode, int& correctGuess){
+        auto tmp = graph[currentNode];
+        while (!tmp.empty()){
+            auto& visit = tmp.back();
+            if (visit != parent){
+                if (guessGraph[currentNode].find(visit) != guessGraph[currentNode].end()) {
+                    correctGuess++;
+                }
+                dfs(guessGraph, graph, currentNode, visit, correctGuess);
+            }
+            tmp.pop_back();
+        }
+    }
+};
