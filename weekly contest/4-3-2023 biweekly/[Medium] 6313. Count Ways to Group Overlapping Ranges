@@ -1,0 +1,28 @@
+class Solution {
+public:
+    int countWays(vector<vector<int>>& ranges) {
+        sort(ranges.begin(), ranges.end());
+        int ptr(-1), group(0);
+        for (auto &pr: ranges){
+            if (ptr < pr[0]){
+                group++;
+                ptr = pr[1];
+            }else{
+                ptr = max(ptr, pr[1]);
+            }
+        }
+        return pow(2LL, group);
+    }
+    
+    long long pow(long long base,long long power){
+        long long result = 1;
+        while (power > 0){
+            if (power % 2 == 1)
+                result = (result * base) % int(1e9+7);
+            power /= 2;
+            base = (base * base) % int(1e9+7);
+        }
+
+        return result;
+    }
+};
