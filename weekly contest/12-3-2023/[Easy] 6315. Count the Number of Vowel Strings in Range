@@ -1,0 +1,11 @@
+class Solution {
+public:
+    int vowelStrings(vector<string>& words, int left, int right) {
+        unordered_set<char> dict{'a', 'e', 'i', 'o', 'u'};
+        int ans(0);
+        for (;left <= right; left++){
+            if (dict.find(words[left][0]) != dict.end() && dict.find(words[left][words[left].size() - 1]) != dict.end()) {ans++;}
+        }
+        return ans;
+    }
+};
