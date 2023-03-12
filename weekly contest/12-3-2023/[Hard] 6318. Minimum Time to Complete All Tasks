@@ -1,0 +1,24 @@
+class Solution {
+public:
+    int findMinimumTime(vector<vector<int>>& tasks) {
+        int dp[2001];
+        memset(dp, 0, sizeof(dp));
+        sort(tasks.begin(), tasks.end());
+        for (auto it = tasks.rbegin(); it != tasks.rend(); it++){
+            int tmp(0);
+            for (auto i = (*it)[0]; i <= (*it)[1]; ++i) {
+                if (dp[i] == 1) tmp++;
+                if (tmp >= (*it)[2]) break;
+            }
+            for (auto i = (*it)[0]; i <= (*it)[1]; ++i){
+                if (tmp >= (*it)[2]) break;
+                if (dp[i] == 0) {dp[i] = 1; tmp++;}
+            }
+        }
+        int ans(0);
+        for (auto i = 0; i < 2001; i++){
+            if (dp[i] == 1) ans++;
+        }
+        return ans;
+    }
+};
