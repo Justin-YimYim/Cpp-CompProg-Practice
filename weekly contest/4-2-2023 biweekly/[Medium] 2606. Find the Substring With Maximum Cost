@@ -1,0 +1,27 @@
+class Solution {
+public:
+    int maximumCostSubstring(string s, string chars, vector<int>& vals) {
+        unordered_map<char, int> dict;
+        for (int i =0; i<chars.size(); i++){
+            dict[chars[i]] = vals[i];
+        }
+        int dp[s.size()];
+        memset(dp, 0, sizeof(dp));
+        for (int i =0; i<s.size(); ++i){
+            if (dict.find(s[i]) != dict.end()){
+                dp[i] = dict[s[i]];
+            }else{
+                dp[i] = s[i] - 'a' + 1;
+            }
+        }
+        long long ans=0, crtsum=0;
+        for (int i=0; i < s.size(); ++i){
+            crtsum += dp[i];
+            if (crtsum < 0) crtsum = 0;
+            if (crtsum > ans) {
+                ans = crtsum;
+            }
+        }
+        return ans;
+    }
+};
