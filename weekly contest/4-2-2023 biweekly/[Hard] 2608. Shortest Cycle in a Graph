@@ -1,0 +1,41 @@
+class Solution {
+public:    
+    int findShortestCycle(int n, vector<vector<int>>& edges) {
+        unordered_map<int, vector<int>> graph;
+        for (auto &a: edges){
+            graph[a[0]].push_back(a[1]);
+            graph[a[1]].push_back(a[0]);
+        }
+        return bfs(n, graph);
+    }
+    
+    int bfs(int n, unordered_map<int, vector<int>>& graph){
+        int res(INT_MAX);
+        for (int i = 0; i < n; i++) {
+            vector<int> length(n, INT_MAX);
+            vector<int> p(n, -1);
+            length[i] = 0;
+            queue<int> q;
+            q.push(i);
+            while (!q.empty()) {
+                int u = q.front();
+                q.pop();
+
+                for (int v : graph[u]) {
+                    if (length[v] == INT_MAX) {
+                        length[v] = 1 + length[u];
+                        p[v] = u;
+                        q.push(v);
+                    }
+                    else if (p[u] != v and p[v] != u)
+                        res = min(res, length[u] + length[v] + 1);
+                }
+            }
+        }
+        if (res == INT_MAX)
+            return -1;
+        else
+            return res;
+    }
+};
+
