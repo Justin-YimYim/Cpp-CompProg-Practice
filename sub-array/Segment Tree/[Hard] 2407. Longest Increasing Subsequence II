@@ -1,0 +1,35 @@
+class SegmentTree{
+public:
+    vector<int> count;
+    SegmentTree(int n): count(4 * n, 0){}
+    int query(int L, int R, int l, int r, int vertex){
+        if (L == l && R == r) return count[vertex];
+        int mid = (L + R) / 2;
+        if (mid < l) return query(mid + 1, R, l, r, vertex * 2 + 1);
+        else if (mid >= r) return query(L, mid, l, r, vertex * 2 + 2);
+        else return max(query(mid + 1, R, mid + 1, r, vertex * 2 + 1), query(L, mid, l, mid, vertex * 2 + 2)); 
+    }
+
+    void setMax(int L, int R, int l, int r, int vertex, int value){
+        count[vertex] = max(count[vertex], value);
+        if (L == l && R == r) return;
+        int mid = (L + R) / 2;
+        if (mid < l) setMax(mid + 1, R, l, r, vertex * 2 + 1, value);
+        else if (mid >= r) setMax(L, mid, l, r, vertex * 2 + 2, value);
+    }
+};
+class Solution {
+public:
+    int lengthOfLIS(vector<int>& nums, int k) {
+        int maxV(0);
+        for (auto &a: nums){
+            maxV = max(a, maxV);
+        }
+        SegmentTree segT(maxV);
+        for (auto &a: nums){
+            int tmp(segT.query(0, maxV, max(0, a - k), a - 1, 0));
+            segT.setMax(0, maxV, a, a, 0, tmp + 1);
+        }
+        return segT.count[0];
+    }
+};
