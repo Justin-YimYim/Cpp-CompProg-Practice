@@ -1,0 +1,35 @@
+class Solution {
+public:
+    int stoneGameVIII(vector<int>& stones) {
+        vector<pair<long long, long long>> minMax(stones.size(), make_pair(LLONG_MIN, LLONG_MAX));
+        vector<long long> preSum;
+        long long tmp(0);
+        for (auto &a: stones) preSum.push_back(tmp += a);
+        minMax[stones.size() - 2].first = preSum[stones.size() - 1];
+        minMax[stones.size() - 2].second = -preSum[stones.size() - 1];
+        
+        minMax[stones.size() - 1].first = 0;
+        minMax[stones.size() - 1].second = 0;
+        return getMax(preSum, minMax, 0);
+    }
+
+    int getMax(vector<long long> &preSum, vector<pair<long long, long long>> &minMax, int position){
+        if (position >= minMax.size()) return 0;
+        if (minMax[position].first != LLONG_MIN) return minMax[position].first;
+        long long posAns(LLONG_MIN);
+        for (int i=position+1; i < minMax.size();++i)
+            posAns = max(posAns, preSum[i] + getMin(preSum, minMax, i));
+        minMax[position].first = posAns;
+        return posAns;
+    }
+
+    int getMin(vector<long long> &preSum, vector<pair<long long, long long>> &minMax, int position){
+        if (position >= minMax.size()) return 0;
+        if (minMax[position].second != LLONG_MAX) return minMax[position].second;
+        long long posAns(LLONG_MAX);
+        for (int i=position+1; i < minMax.size();++i)
+            posAns = min(posAns, getMax(preSum, minMax, i) - preSum[i]);
+        minMax[position].second = posAns;
+        return posAns;
+    }
+};
