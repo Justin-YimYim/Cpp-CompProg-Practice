@@ -1,0 +1,35 @@
+class TrieNode{
+public:
+    TrieNode *next[26];
+    int count;
+    TrieNode(): count(0){memset(next, 0, sizeof(next));}
+};
+
+class Solution {
+public:
+    vector<int> sumPrefixScores(vector<string>& words) {
+        int maxLen(0);
+        TrieNode* head = new TrieNode();
+        for (auto &a: words){
+            TrieNode* loop = head;
+            for (auto &b: a){
+                if (loop->next[b - 'a'] == nullptr){
+                    loop->next[b - 'a'] = new TrieNode();
+                }
+                loop = loop->next[b - 'a'];
+                loop->count++;
+            }
+        }
+        vector<int> ans;
+        for (auto &a: words){
+            TrieNode* loop = head;
+            int tmp(0);
+            for (auto &b: a){
+                loop = loop->next[b - 'a'];
+                tmp += loop->count;
+            }
+            ans.push_back(tmp);
+        }
+        return ans;
+    }
+};
