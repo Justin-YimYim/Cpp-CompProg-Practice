@@ -1,0 +1,54 @@
+class Solution {
+public:
+    bool splitArraySameAverage(vector<int>& nums) {
+        unordered_map<int, unordered_set<long double>> dict;
+        dict[0].insert(0);
+        sort(nums.begin(), nums.end());
+        long double sum(0);
+        for (auto &a: nums) sum += a;
+        long double average(sum / nums.size());
+        vector<long double> preSum;
+        for (int i = 0; i < nums.size(); ++i) preSum.push_back((i + 1) * average);
+        enumerate(dict, nums);
+        int n(0), k = nums.size() - nums.size() / 2, t = nums.size() / 2;
+        // for (auto &a: preSum) cout << a << endl;
+        while (n != 1 << k){
+            int tmp(n), cnt(0), bit(0);
+            long long tmpSum(0);
+            while (tmp > 0){
+                if (tmp % 2) {
+                    tmpSum+=nums[cnt + t];
+                    bit++;
+                }
+                tmp/=2;
+                cnt++;
+            }
+            for (int i = 0; i < t; ++i){
+                if (bit + i == 0) continue;
+                if (dict[i].find(preSum[bit + i - 1] - tmpSum) != dict[i].end()){
+                    // cout << bit + i << " " << preSum[bit + i - 1] - tmpSum << endl;
+                    return true;
+                    }
+            }
+            n++;
+        }
+        return false;
+    }
+    void enumerate(unordered_map<int, unordered_set<long double>> &dict, vector<int> &nums){
+        int k = nums.size() / 2, n(1);
+        while (n != 1 << k){
+            int tmp(n), cnt(0), bit(0);
+            long long tmpSum(0);
+            while (tmp > 0){
+                if (tmp % 2) {
+                    tmpSum+=nums[cnt];
+                    bit++;
+                }
+                tmp/=2;
+                cnt++;
+            }
+            dict[bit].insert(tmpSum);
+            n++;
+        }
+    }
+};
