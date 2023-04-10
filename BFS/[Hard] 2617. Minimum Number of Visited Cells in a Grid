@@ -1,0 +1,31 @@
+class Solution {
+public:
+    int minimumVisitedCells(vector<vector<int>>& grid) {
+        int dp[grid.size()][grid[0].size()];
+        memset(dp, 0, sizeof(dp));
+        queue<pair<int, int>> q;
+        dp[0][0] = 1;
+        q.push({0, 0});
+        while (!q.empty()){
+            if (dp[grid.size() - 1][grid[0].size() - 1] != 0) return dp[grid.size() - 1][grid[0].size() - 1];
+            auto &top = q.front();
+            int y = grid[top.first][top.second] + top.first;
+            for (int i = top.first; i <= min(y, int(grid.size()) - 1); ++i){
+                if (dp[i][top.second] == 0){
+                    dp[i][top.second] = dp[top.first][top.second] + 1;
+                    q.push({i, top.second});
+                }
+            }
+            int x = grid[top.first][top.second] + top.second;
+            for (int i = top.second; i <= min(x, int(grid[0].size()) - 1); ++i){
+                if (dp[top.first][i] == 0){
+                    dp[top.first][i] = dp[top.first][top.second] + 1;
+                    q.push({top.first, i});
+                }
+            }
+            q.pop();
+        }
+        if (dp[grid.size() - 1][grid[0].size() - 1] == 0) return -1;
+        else return dp[grid.size() - 1][grid[0].size() - 1];
+    }
+};
