@@ -1,0 +1,61 @@
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    TreeNode* replaceValueInTree(TreeNode* root) {
+        vector<long long> pre;
+        pre.push_back(root->val);
+        preSum(root, 1, pre);
+        root->val = 0;
+        buildTree(root, 1, pre);
+        return root;
+    }
+    
+    void preSum(TreeNode* crt, int depth, vector<long long>& tmp){
+        if (crt->left != nullptr){
+            if (tmp.size() - 1 < depth){
+                tmp.push_back(crt->left->val);
+            }else{
+                tmp[depth] += crt->left->val;
+            }
+            preSum(crt->left, depth+1, tmp);
+        }
+        if (crt->right != nullptr){
+            if (tmp.size() - 1 < depth){
+                tmp.push_back(crt->right->val);
+            }else{
+                tmp[depth] += crt->right->val;
+            }
+            preSum(crt->right, depth+1, tmp);
+        }
+    }
+    
+    void buildTree(TreeNode* crt, int depth, vector<long long> &pre){
+        long long tmp(0);
+        if (crt->left != nullptr){
+            tmp += crt->left->val;
+        }
+        if (crt->right != nullptr){
+            tmp += crt->right->val;
+        }
+        
+        if (crt->left != nullptr){
+            crt->left->val = pre[depth] - tmp;
+            buildTree(crt->left, depth + 1, pre);
+        }
+        if (crt->right != nullptr){
+            crt->right->val = pre[depth] - tmp;
+            buildTree(crt->right, depth+1, pre);
+        }
+    }
+    
+};
