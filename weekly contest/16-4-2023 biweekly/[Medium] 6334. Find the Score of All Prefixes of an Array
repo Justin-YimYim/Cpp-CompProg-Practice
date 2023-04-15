@@ -1,0 +1,16 @@
+class Solution {
+public:
+    vector<long long> findPrefixScore(vector<int>& nums) {
+        vector<int> dp;
+        dp.push_back(nums[0]);
+        for (int i = 1; i < nums.size(); ++i) dp.push_back(max(dp[dp.size() - 1], nums[i]));
+        vector<long long> ans;
+        for (int i = 0; i < nums.size(); ++i) {
+            long long tmp(dp[i] + nums[i]);
+            ans.push_back(tmp);
+        }
+        long long tmp = 0;
+        for (auto &a: ans) a = tmp += a;
+        return ans;
+    }
+};
