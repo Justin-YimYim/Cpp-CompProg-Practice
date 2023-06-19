@@ -1,0 +1,41 @@
+class Solution {
+public:
+    int countPaths(vector<vector<int>>& grid) {
+        map<int, vector<pair<int, int>>> sortIndex;
+        int dp[grid.size()][grid[0].size()];
+        int mod(1e9+7);
+        memset(dp, 0, sizeof(dp));
+
+        for (int i = 0; i < grid.size(); ++i){
+            for (int j = 0; j < grid[0].size(); ++j){
+                sortIndex[grid[i][j]].push_back(make_pair(i, j));
+            }
+        }
+
+        for (auto it = sortIndex.rbegin(); it != sortIndex.rend(); ++it){
+            auto lt = it->second;
+            for (auto &pr: lt){
+                int x = pr.first;
+                int y = pr.second;
+                
+                long long sum(0);
+                if (x - 1 >= 0 && grid[x-1][y] != grid[x][y]) sum += dp[x - 1][y];
+                if (x + 1 < grid.size() && grid[x+1][y] != grid[x][y]) sum += dp[x + 1][y];
+                if (y - 1 >= 0 && grid[x][y-1] != grid[x][y]) sum += dp[x][y - 1];
+                if (y + 1 < grid[0].size() && grid[x][y + 1] != grid[x][y]) sum += dp[x][y + 1];
+                sum += 1;
+                dp[x][y] = sum % mod;
+            }
+        }
+        long long ans(0);
+        for (int i = 0; i < grid.size(); ++i){
+            for (int j = 0; j < grid[0].size(); ++j){
+                cout << dp[i][j] << " ";
+                (ans += dp[i][j]) %= mod;
+            }
+            cout << endl;
+        }
+
+        return ans;
+    }
+};
