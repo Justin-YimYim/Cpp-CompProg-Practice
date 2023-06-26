@@ -1,0 +1,50 @@
+class Solution {
+public:
+    vector<int> survivedRobotsHealths(vector<int>& positions, vector<int>& healths, string directions) {
+        map<int, pair<int, char>> srt;
+        for (int i = 0; i < positions.size(); ++i)
+            srt.insert({positions[i], make_pair(healths[i], directions[i])});
+        deque<pair<int, pair<int, char>>> q;
+        for (auto &a: srt){
+            if (q.empty() || a.second.second == 'R'){
+                q.push_back(a);
+            }
+            else {
+                while (!q.empty()){
+                    auto &prev = q.back();
+                    if (prev.second.second == 'R'){
+                        if (prev.second.first > a.second.first){
+                            prev.second.first--;
+                            break;
+                        }
+                        else if (prev.second.first == a.second.first){
+                            q.pop_back();
+                            break;
+                        }
+                        else{
+                            q.pop_back();
+                            a.second.first--;
+                            if (q.empty()) q.push_back(a);
+                        }
+                    }
+                    else{
+                        q.push_back(a);
+                        break;
+                    }
+                }
+            }
+        }
+
+        unordered_map<int, pair<int, char>> tmp;
+        for (auto &a: q){
+            tmp[a.first] = a.second;
+        }
+        vector<int> ans;
+        for (auto &a: positions){
+            if (tmp.find(a) != tmp.end()){
+                ans.push_back(tmp[a].first);
+            }
+        }
+        return ans;
+    }
+};
