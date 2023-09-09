@@ -1,0 +1,86 @@
+#include <vector>
+#include <iostream>
+#include <map>
+#include <unordered_map>
+#include <cmath>
+#include <numeric>
+
+using namespace std;
+
+struct unionFind{
+    public:
+        vector<long long> root;
+        vector<long long> size;
+        unionFind(long long n): root(n + 1), size(n + 1, 1){
+            iota(root.begin(), root.end(), 0);
+        }
+        
+        long long findRoot(long long key){
+            if (root[key] != key){
+                root[key] = findRoot(root[key]);
+            }
+            return root[key];
+        }
+        
+        void merge(long long key1, long long key2){
+            long long root1 = findRoot(key1), root2 = findRoot(key2);
+            if (getSize(key1) > getSize(key2)){
+                root[root2] = root1; 
+                root[key2] = root1;
+                size[root1] += size[root2];
+            }else{
+                root[root1] = root2;
+                root[key1] = root2;
+                size[root2] += size[root1];
+            }
+        }
+        
+        long long getSize(long long key){
+            return size[findRoot(key)];
+        }
+};
+
+long long pow(long long base,long long power, long long mod){
+    long long result = 1;
+    while (power > 0){
+        if (power % 2 == 1)
+            result = (result * base) % (mod);
+        power /= 2;
+        base = (base * base) % (mod);
+    }
+
+    return result;
+}
+    
+int main(){
+    long long mod(998244353);
+    long long t;
+    cin >> t;
+    for (; t > 0; t--){
+        unordered_map<long long, long long> max_weight;
+        long long n, S;
+        cin >> n >> S;
+        multimap<long long, pair<long long, long long>> dict;
+        for (long long i = 1; i < n; ++i){
+            long long u, v, w;
+            cin >> u >> v >> w;
+            dict.insert(make_pair(w, make_pair(u, v)));
+            max_weight[u] = max(max_weight[u], w);
+            max_weight[v] = max(max_weight[v], w);
+        }
+        
+        unionFind uf(n);
+        long long ans(1);
+        for (auto &a: dict){
+            long long v(a.second.first), u(a.second.second);
+            long long s1(uf.getSize(v)), s2(uf.getSize(u));
+            if (s1 == 1 && s2 == 1) {}
+            else{
+                ans = (ans * pow(S - a.first + 1, s1 * s2 - 1, mod)) % mod;
+            }
+            uf.merge(v, u);
+        }
+        cout << ans << endl;
+    }
+    return 0;
+}
