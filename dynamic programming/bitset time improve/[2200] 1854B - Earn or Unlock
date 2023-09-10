@@ -1,0 +1,38 @@
+#include <iostream>
+#include <unordered_set>
+#include <cstring>
+#include <bitset>  
+
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+    long long dp0[n + 1];
+    long long presum[n * 2 + 1];
+    bitset<200001> reachable, masks;
+    memset(presum, 0, sizeof(presum));
+    for (int i = 0; i < n; i++)
+        cin >> dp0[i];
+    
+    long long tmp = 0;
+    for (int i = 0; i < n; i++)        
+        presum[i] = (tmp += dp0[i]);
+    
+    for (int i = n; i < n * 2 + 1; ++i)
+        presum[i] = presum[n - 1];
+        
+    long long ans(0);
+    masks.set();
+    reachable[0] = 1;
+    for (int i = 0; i < n; i++){
+        reachable |= (reachable & masks) << dp0[i];
+        masks <<= 1;
+    }
+        
+    for (int i = 0; i < n * 2 + 1; ++i)
+        if (reachable[i]) ans = max(presum[i] - i, ans);
+        
+    cout << ans;
+    return 0;
+}
