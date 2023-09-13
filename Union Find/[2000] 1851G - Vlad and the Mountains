@@ -1,0 +1,87 @@
+#include <bits/stdc++.h>
+#include <iostream>
+
+using namespace std;
+
+struct unionFind{
+public:
+    vector<int> root;
+    unionFind(int n): root(n + 1){
+        iota(root.begin(), root.end(), 0);
+    }
+    
+    int findRoot(int key){
+        if (root[key] != key) 
+            root[key] = findRoot(root[key]);
+        return root[key];
+    }
+    
+    void merge(int key1, int key2){
+        int root1(findRoot(key1)), root2(findRoot(key2));
+        root[root1] = root2;
+    }
+};
+
+int main() {
+    int t;
+    cin >> t;
+    for (; t > 0; t--){
+        int n, m;
+        cin >> n >> m;
+        multimap<long long, int> h;
+        vector<int> mountains(n + 1);
+        vector<bool> added(n + 1, 0);
+        vector<vector<int>> graph(n + 1);
+        unionFind uf(n);
+        for (int i = 1; i <= n; ++i){
+            long long tmp;
+            cin >> tmp;
+            h.insert({tmp, i});
+            mountains[i] = tmp;
+        }
+        
+        for (int i = 0; i < m; ++i){
+            int u, v;
+            cin >> u >> v;
+            graph[u].push_back(v);
+            graph[v].push_back(u);
+        }
+        
+        int q;
+        cin >> q;
+        multimap<long long, pair<int, pair<int, int>>> queries;
+        vector<bool> ans(q + 1, 0);
+        for (int i = 1; i <= q; ++i){
+            int a, b;
+            long long e;
+            cin >> a >> b >> e;
+            pair<int, int> tmp{a, b};
+            pair<int, pair<int, int>> tmp2{i, tmp};
+            e += mountains[a];
+            queries.insert({e, tmp2});
+        }
+        
+        for (auto &a: queries){
+            long long e(a.first);
+            int i(a.second.first);
+            int u(a.second.second.first), v(a.second.second.second);
+
+            while (!h.empty() && h.begin()->first <= e){
+                int crt(h.begin()->second);
+                added[crt] = 1;
+                for (auto &a: graph[crt])
+                    if (added[a]) uf.merge(crt, a);
+                h.erase(h.begin());
+            }
+            if (uf.findRoot(u) == uf.findRoot(v)) ans[i] = true;
+        }
+
+        for (int i = 1; i < ans.size(); ++i){
+            if (ans[i]) cout << "YES" << endl;
+            else cout << "NO" << endl;
+        }
+        cout << endl;
+    }
+
+    return 0;
+}
