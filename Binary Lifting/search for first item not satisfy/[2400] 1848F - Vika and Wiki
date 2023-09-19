@@ -1,0 +1,35 @@
+#include <bits/stdc++.h>
+#define LL long long
+
+using namespace std;
+
+
+int main(){
+	ios::sync_with_stdio(0);cin.tie(0);cout.tie(0);
+    LL n;
+    cin >> n;
+    vector<int> arr(n), b(n);
+    for (int i = 0; i < n; ++i) cin >> arr[i];
+    
+    if (std::all_of(arr.begin(), arr.end(), [](int i) { return i==0; })) {
+        cout << 0 << endl;
+        return 0;
+    }
+    
+    LL ans(1);
+
+    for (int i = n/2; i > 0; i /= 2){
+        for (int j = 0; j < n; j++) 
+            b[j] = arr[j] ^ arr[(j + i) % n];
+
+        for (auto &a: b)
+            if (a != 0){
+                ans += i;
+                arr = b;
+                break;
+            }
+    }
+    
+    cout << ans << endl;
+    return 0;
+}
