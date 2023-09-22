@@ -1,0 +1,76 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+struct unionFind{
+    vector<int> root;
+    unionFind(int n): root(n + 1){
+        iota(root.begin(), root.end(), 0);
+    } 
+    
+    int findRoot(int key){
+        if (root[key] != key) root[key] = findRoot(root[key]);
+        return root[key];
+    }
+    
+    void merge(int key1, int key2){
+        int root1(findRoot(key1)), root2(findRoot(key2));
+        root[root2] = root1;
+        root[key2] = root1;
+    }
+};
+
+int main()
+{
+    int t;
+    
+    cin >> t;
+    while (t--){
+        int n, m, k;
+        cin >> n >> m >> k;
+        unionFind uf(n + m + 2);
+        vector<pair<int, int>> conflict;
+        while (k--){
+            int x1, y1, x2, y2;
+            cin >> x1 >> y1 >> x2 >> y2;
+            if (x1 + 1 == x2 && y1 + 1 == y2){
+                uf.merge(x2, n + y2);
+            }else{
+                conflict.push_back({x2, n + y1});
+            }
+        }
+
+        unordered_map<int, vector<int>> graph;
+        unordered_map<int, int> layer;
+        for (auto &pr: conflict){
+            int c1 = uf.findRoot(pr.first), c2 = uf.findRoot(pr.second);
+            graph[c1].push_back(c2);
+            graph[c2].push_back(c1);
+            layer[c1] = -1;
+            layer[c2] = -1;
+        }
+        bool flag(true);
+        while (!graph.empty() && flag){
+            int crt = graph.begin()->first;
+            if (layer[crt] == -1) layer[crt] = 0;
+            queue<int> q;
+            q.push(crt);
+            while (!q.empty() && flag){
+                crt = q.front();
+                for (auto &a: graph[crt]){
+                    q.push(a);
+                    if (layer[a] == layer[crt]){
+                        cout << "NO" << endl; 
+                        flag = false;
+                        break;
+                    }
+                    layer[a] = (layer[crt] + 1) % 2;
+                }
+                graph.erase(crt);
+                q.pop();
+            }
+        }
+        if (flag) cout << "YES" << endl;
+    }
+    return 0;
+}
