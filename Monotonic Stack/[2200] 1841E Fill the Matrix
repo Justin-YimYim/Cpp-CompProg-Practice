@@ -1,0 +1,83 @@
+#include <bits/stdc++.h>
+
+#define LL long long
+
+using namespace std;
+int main()
+{
+    LL t;
+    
+    cin >> t;
+    while (t--){
+        LL n;
+        cin >> n;
+        map<LL, LL> mp;
+        stack<pair<LL, LL>> incStk;
+        for (LL i = 0; i < n; i++){
+            LL crt;
+            cin >> crt;
+            crt = n - crt;
+            LL pos = i;
+            while (!incStk.empty()){
+                auto top = incStk.top();
+                if (top.first < crt) {
+                    incStk.push({crt, pos});
+                    break;
+                }
+                if (top.first == crt) break;
+                if (top.first > crt){
+                    incStk.pop();
+                    if (incStk.empty())
+                        mp[i - top.second] += top.first - crt;
+                    else{
+                        auto next = incStk.top();
+                        mp[i - top.second] += top.first - max(next.first, crt);
+                    }
+                    pos = top.second;
+                }
+            }
+            if (incStk.empty() && crt) incStk.push({crt, pos});
+        }
+        
+        while (!incStk.empty()){
+            auto top = incStk.top();
+            incStk.pop();
+            if (incStk.empty())
+                mp[(n - top.second)] += top.first;
+            else{
+                auto next = incStk.top();
+                mp[(n - top.second)] += top.first - next.first;
+            }
+        }
+
+        long long m, ans(0);
+        cin >> m;
+        
+        // for (auto &a: mp){
+        //     cout << a.first << ": " << a.second << endl;
+        // }
+        // cout << "ANS:";
+        auto ptr(mp.rbegin());
+        while (m > 0){
+        //     cout << ans << " ";
+            if (ptr == mp.rend() || ptr->first == 1) break;
+            if (!mp.empty()){
+                LL frt(ptr->first);
+                if (m/frt >= mp[frt])
+                    {
+                        ans += (frt - 1 ) * mp[frt];
+                        ptr++;
+                        m -= frt * mp[frt];
+                    }
+                else 
+                    {
+                        ans += (m / frt) * (frt - 1) + max(0LL, (m % frt - 1));
+                        m = 0;
+                    }
+            }else break;
+        }
+        // cout << endl;
+        cout << ans << endl;
+    }
+    return 0;
+}
