@@ -1,0 +1,65 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+void bfs(unordered_map<int, vector<pair<int, int>>> &g, int i, vector<vector<long>> &dp, int n){ 
+    deque<int> de;
+    dp[i][n + i + 3] = 0;
+    de.push_front(i + 3 + n);
+    while (!de.empty()){
+        auto crt = de.front();
+        de.pop_front();
+        for (auto& a: g[crt]){
+            if (dp[i][a.first] > dp[i][crt] + a.second){
+                dp[i][a.first] = dp[i][crt] + a.second;
+                if (a.second)
+                    de.push_back(a.first);
+                else
+                    de.push_front(a.first);
+            }
+        }
+    }
+}
+
+int main()
+{
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(0);
+    std::cout.tie(0);
+ 
+    string s;
+    cin >> s;
+    
+    unordered_map<int, vector<pair<int, int>>> g;
+    
+    for (int i = 0; i < s.size() - 1; ++i)
+        {
+        g[i].push_back({(s[i] - 'a') * 26 + s[i + 1] - 'a' + 3 + s.size(), 0});
+        g[(s[i] - 'a') * 26 + s[i + 1] - 'a' + 3 + s.size()].push_back({i, 1});
+        }
+    
+    for (int i = 0; i < s.size() - 2; ++i)
+        g[i].push_back({i + 1, 1});
+    for (int i = 1; i < s.size() - 1; ++i)
+        g[i].push_back({i - 1, 1});
+        
+    const int x(26 * 26 + 5);
+    
+    vector<vector<long>> dp(x, vector<long> (x + s.size(), s.size() + 1));
+
+    for (int i = 0; i < 26 * 26; ++i)
+        bfs(g, i, dp, s.size());
+
+    int m;
+    cin >> m;
+    while (m--){
+        int f, t;
+        cin >> f >> t;
+        long ans = abs(f - t);
+        for (int i = 0; i < 26 * 26; ++i)
+            ans = min(ans, dp[i][f - 1] + dp[i][t - 1] - 1);
+        cout << ans << endl;
+    }
+
+    return 0;
+}
