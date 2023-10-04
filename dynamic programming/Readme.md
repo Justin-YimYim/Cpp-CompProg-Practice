@@ -18,3 +18,6 @@
 ### When cant think of forward think of other direction
 ### Search on state vs space
 - could prune the space
+
+### diagonal dp for optimization
+dp_i-k_j-k can optimized into dp_i-j
