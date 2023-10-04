@@ -21,3 +21,4 @@
 
 ### diagonal dp for optimization
 dp_i-k_j-k can optimized into dp_i-j
+--> i - j means unselected items --> if monotonicity for unselected items is true, then yes 
