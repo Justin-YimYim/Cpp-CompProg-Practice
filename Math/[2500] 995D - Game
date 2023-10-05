@@ -1,0 +1,26 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+int main(){
+    long long n, r;
+    cin >> n >> r;
+    long long arr[1LL << n];
+    double ans(0);
+
+    for (int i = 0; i < (1LL << n); ++i){
+        cin >> arr[i];
+        ans += arr[i];
+    }
+
+    printf("%f \n" , ans / double(1LL << n)); 
+    while (r--){
+        long long x, y;
+        cin >> x >> y;
+        ans = ans - arr[x] + y;
+        arr[x] = y;
+        printf("%f \n" , ans / double(1LL << n)); 
+    }    
+
+    return 0;
+}
