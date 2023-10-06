@@ -1,0 +1,49 @@
+#include <bits/stdc++.h>
+#define mod(crt, i, n) (crt * i % n ? crt * i % n: n)
+
+
+using namespace std;
+
+long long calculate(long long n, long long i){
+    std::ios::sync_with_stdio(0);
+    cout.tie(0);
+    bool arr[2001] = {};
+    
+    long long ans(0), crt(1);
+    for (int j = 0; j < i; ++j){
+        if (arr[crt * i % n]) break;
+        arr[crt * i % n] = true;
+        
+        long long low = max(0LL, (mod(crt, i, n) - crt) / (1 - i));
+        long long tmp(low + crt), tmp2;
+        if (mod(tmp, i, n) <= crt + low) low++;
+        long long high = (n - mod(crt, i, n)) / i;
+        // cout << low << " " << high << " ";
+        tmp = low + crt;
+        tmp2 = high + crt;
+        if (low <= high){
+            ans += (high - low + 1) * (mod(tmp, i, n) + mod(tmp2, i, n)) / 2;
+        }
+        crt += high + 1;
+    }
+    // cout << ans << endl;
+    return ans;
+}
+
+int main(){
+    long long n, m;
+    cin >> n >> m;
+    long long ans(1);
+    long long t(0);
+    for (long long i = 2; i <= m; ++i){
+        // cout << "crt i:  " << i << " ";
+        long long tmp(calculate(n, i));
+        if (tmp > t){
+            t = tmp;
+            ans = i;
+        }
+    }
+    
+    cout << ans << endl;
+    return 0;
+}
