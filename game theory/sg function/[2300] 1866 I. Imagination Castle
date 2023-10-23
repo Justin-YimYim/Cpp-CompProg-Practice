@@ -1,0 +1,47 @@
+#include<bits/stdc++.h>
+#include<unordered_set>
+
+using namespace std;
+using ll = long long;
+
+int main(){
+    ios_base::sync_with_stdio(false);
+    cin.tie(0), cout.tie(0);
+    int n,m,k;
+    cin>>n>>m>>k;
+    int mm=m;
+    unordered_map<int, vector<int> > g;
+    unordered_set<int> visited;
+    while (k--){
+        int x,y;
+        cin>>x>>y;
+        if (x == 1 || y == 1){
+            cout << "Chaneka" << endl;
+            return 0;
+        }
+        g[x].push_back(y);
+    }
+    
+    for (; n > 1; n--){
+        bool flag(false);
+        if (visited.size() + 1 >= mm && g[n].size() == 0){
+            cout << "Chaneka" << endl;
+            return 0;
+        }
+        if (m <= 1) continue;
+        for (auto it = g[n].rbegin(); it != g[n].rend(); it++){
+            if (*it > m) flag = true;
+            visited.insert(*it);
+        }
+
+        if (!flag) visited.insert(m);
+        while (visited.find(m) != visited.end()) m--;
+    }
+
+    if (visited.size() + 1 >= mm){
+        cout << "Bhinneka" << endl;
+    }else
+        cout << "Chaneka" << endl;
+    return 0;
+
+}
