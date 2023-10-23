@@ -1,0 +1,133 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+struct e{
+    int t;
+    int w;
+    int next;
+};
+e edge[14000];
+int head[304], d[304], q[304];
+
+bool makelevel(int s, int t){
+	memset(d, 0, sizeof(d));
+	memset(q, 0, sizeof(q));
+	// level
+	d[s] = 1;
+	int l = 0, r = 0;
+	// queue
+	q[r++] = s;
+	while (l < r){
+		int x = q[l++];
+		if (x == t) return true;
+		for (int i = head[x]; i != -1; i = edge[i].next){
+			if ((d[edge[i].t] == 0) && (edge[i].w != 0)){
+				q[r++] = edge[i].t;
+				d[edge[i].t] = d[x] + 1;
+			}
+		}
+	}
+	return false;
+}
+
+
+int dinic(int x, int flow, int t){
+	if (x == t) return flow;
+	int sum = 0;
+	for (int i = head[x]; i != -1; i = edge[i].next){
+		if ((edge[i].w != 0) && (d[edge[i].t] == d[x] + 1)){
+			int tmp = dinic(edge[i].t, min(flow - sum, edge[i].w), t);
+			// in psuedo adjcent list, edge is odd-even pair
+			edge[i].w -= tmp;
+			edge[i ^ 1].w += tmp;
+			sum += tmp;
+			if (sum == flow) return sum;
+		}
+	}
+	return sum;
+}
+
+void createEdge(int x, int y, int& cnt){
+    cnt++;
+    edge[cnt].t = y;
+    edge[cnt].next = head[x];
+    edge[cnt].w = 1; 
+    head[x] = cnt;
+    
+    cnt++;
+    edge[cnt].t = x;
+    edge[cnt].next = head[y];
+    edge[cnt].w = 0;
+    head[y] = cnt;
+    return;
+}
+
+int main(){
+    std::ios::sync_with_stdio(0);
+    cin.tie(0);
+    int n, m;
+    cin>>n>>m;
+    memset(head, 0xff, sizeof(head));
+    int cnt(-1);
+    for (int i = 0; i < m; ++i){
+        int x,y;
+        cin>>x>>y;
+        createEdge(x , y + 151, cnt);
+
+    }
+    for (int i = 1; i <= n; ++i){
+        createEdge(0, i, cnt);
+        createEdge(i + 151, 303, cnt);
+    }
+
+    while (makelevel(0, 303)){
+        dinic(0, INT_MAX, 303);
+    }
+    int nxt[152];
+    int prv[152];
+    memset(nxt, 0, sizeof(nxt));
+    memset(prv, 0, sizeof(prv));
+    for (int i = 1; i <= n; ++i){
+        for (int j = head[i]; j != -1; j = edge[j].next){
+            if (edge[j].w == 0 && edge[j].t){
+                // cout << i << " " << edge[j].t << endl;
+                nxt[i] = edge[j].t - 151;
+                prv[edge[j].t - 151] = i;
+            }
+        }
+    }
+
+    // for (auto &a: nxt){
+    //     cout << a << " ";
+    // }
+    // cout << endl;
+    // for (auto &a: prv){
+    //     cout << a << " ";
+    // }
+    bool visited[152] = {};
+    deque<int> d;
+    int ans(0);
+    for (int i = 1; i <= n; ++i){
+        if (visited[i]) continue;
+        ans++;
+        d.push_back(i);
+        visited[i] = 1;
+        for (int j = nxt[i]; j != 0; j = nxt[j]){
+            if (j == -151) break;
+            visited[j] = 1;
+            d.push_back(j);
+        }
+        for (int j = prv[i]; j != 0; j = prv[j]){
+            visited[j] = 1;
+            d.push_front(j);
+        }
+        for (auto &a: d){
+            cout << a << " ";
+        }
+        cout << endl;
+        d = deque<int> ();
+    }
+    cout << ans << endl;
+    return 0;
+}
