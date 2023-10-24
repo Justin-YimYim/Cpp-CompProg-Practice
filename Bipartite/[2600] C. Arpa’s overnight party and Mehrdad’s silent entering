@@ -1,0 +1,56 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+struct uf{
+    vector<int> root;
+    uf(int n): root(n + 1, 0){
+        iota(root.begin(), root.end(), 0);
+    }
+
+    void merge(int i, int j){
+        int rootI(findRoot(i)), rootJ(findRoot(j));
+        root[rootI] = rootJ;
+        root[i] = rootJ;
+    }
+
+    int findRoot(int i){
+        if (root[i] != i) 
+            root[i] = findRoot(root[i]);
+        return root[i];
+    }
+};
+
+int main(){
+    std::ios::sync_with_stdio(0);
+    cin.tie(0);
+    int n;
+    cin>>n;
+    uf unionFind(4 * n);
+
+    vector<pair<int, int> > tmp;
+    for (int i =1 ; i <= n; ++i){
+        int x, y;
+        cin>>x>>y;
+        tmp.push_back(make_pair(x, y));
+        unionFind.merge(x, y + n * 2);
+        unionFind.merge(x + n * 2, y);
+        unionFind.merge(i * 2 - 1, (n + i) * 2);
+        unionFind.merge((i + n) * 2 - 1, i * 2);
+    }
+    vector<int> tmp2(2*n + 2, 0);
+    for (int i = 1; i <= 4 * n; ++i){
+        unionFind.findRoot(i);
+        if (unionFind.findRoot(i) <= 2 * n){
+            if (i > 2 * n)
+                tmp2[i - 2 * n] = 2;
+            else
+                tmp2[i] = 1;
+        }
+    }
+
+    for (auto &a: tmp){
+        cout << tmp2[a.first] << " " << tmp2[a.second] << endl;
+    }
+    return 0;
+}
