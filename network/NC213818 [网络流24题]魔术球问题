@@ -1,0 +1,129 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+struct e{
+    int t;
+    int w;
+    int next;
+};
+e edge[100000];
+int head[20002];
+int sq[150], d[20002], q[20002];
+
+bool makelevel(int s, int t){
+	memset(d, 0, sizeof(d));
+	memset(q, 0, sizeof(q));
+	// level
+	d[s] = 1;
+	int l = 0, r = 0;
+	// queue
+	q[r++] = s;
+	while (l < r){
+		int x = q[l++];
+		if (x == t) return true;
+		for (int i = head[x]; i != -1; i = edge[i].next){
+			if ((d[edge[i].t] == 0) && (edge[i].w != 0)){
+				q[r++] = edge[i].t;
+				d[edge[i].t] = d[x] + 1;
+			}
+		}
+	}
+	return false;
+}
+
+int dinic(int x, int flow, int t){
+	if (x == t) return flow;
+	int sum = 0;
+	for (int i = head[x]; i != -1; i = edge[i].next){
+		if ((edge[i].w != 0) && (d[edge[i].t] == d[x] + 1)){
+			int tmp = dinic(edge[i].t, min(flow - sum, edge[i].w), t);
+			// in psuedo adjcent list, edge is odd-even pair
+			edge[i].w -= tmp;
+			edge[i ^ 1].w += tmp;
+			sum += tmp;
+			if (sum == flow) return sum;
+		}
+	}
+	return sum;
+}
+
+void addEdge(int s, int t, int &cnt){
+    cnt++;
+    edge[cnt].next = head[s];
+    edge[cnt].w = 1;
+    edge[cnt].t = t;
+    head[s] = cnt;
+    
+    cnt++;
+    edge[cnt].next = head[t];
+    edge[cnt].w = 0;
+    edge[cnt].t = s;
+    head[t] = cnt;
+}
+
+void createAdd(int ans, int &cnt){
+    for (int i = 0; i < 150; ++i){
+        if (sq[i] - ans < ans && sq[i] - ans > 0){
+            // cout << ans << " " << sq[i] - ans << endl;
+            addEdge(sq[i] - ans, ans + 10000, cnt);
+        }
+    }
+}
+int nxt[10000];
+int visited[10000];
+int main(){
+    int n;
+    cin>>n;
+    memset(head, -1, sizeof(head));
+    for (int i = 2; i < 152; ++i)
+        sq[i - 2] = i * i;
+
+    int cnt(-1);
+    int ans(0), flow(0);
+    while (ans - flow <= n){
+        ans++;
+        addEdge(0, ans, cnt);
+        addEdge(ans + 10000, 20001, cnt);
+        createAdd(ans, cnt);
+        while(makelevel(0, 20001)){
+            flow += dinic(0, INT_MAX, 20001);
+        }
+    }
+    ans--;
+    cout << ans << endl;
+    memset(head, -1, sizeof(head));
+    memset(edge, 0, sizeof(edge));
+    cnt = -1;
+    for (int i = 1; i <= ans; ++i){
+        addEdge(0, i, cnt);
+        addEdge(i + 10000, 20001, cnt);
+        createAdd(i, cnt);
+    }
+    while(makelevel(0, 20001)){
+        dinic(0, INT_MAX, 20001);
+    }    
+    
+    for (int i = 1; i <= ans; ++i)
+        for (int j = head[i]; j != -1; j = edge[j].next)
+            if (edge[j].w == 0 && edge[j].t)
+                nxt[i] = edge[j].t - 10000;
+        
+
+    deque<int> d;
+    for (int i = 1; i <= ans; i++){
+        if (visited[i]) continue;
+        visited[i] = 1;
+        d.push_back(i);
+        for (int j = nxt[i]; j != 0; j = nxt[j]){
+            visited[j] = 1;
+            d.push_back(j);
+        }
+        for (auto &a: d)
+            cout << a << " ";
+        cout << endl;
+        d = deque<int> ();
+    }
+    
+    return 0;
+}
