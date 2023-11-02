@@ -1,0 +1,73 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+#define pii pair<int, int>
+#define ll long long
+
+unordered_map <int, vector<pii> > g;
+
+const int max_n = 1e5 * 2 + 5;
+
+ll dp[max_n][4];
+// +0: normal adding
+// +1: doubling
+// +2: take as zero
+
+int main(){
+    std::ios::sync_with_stdio(0), cin.tie(0), cout.tie(0);
+    int n, m;
+    cin>>n>>m;
+    while(m--){
+        int u,v,w;
+        cin>>u>>v>>w;
+        g[u].emplace_back(v,w);
+        g[v].emplace_back(u,w);
+    }
+
+    memset(dp, 0x7f, sizeof(dp));
+    dp[1][0] = 0;
+
+    set<pair<ll, pii> > pq;
+    // {weight, {vertex, layer}}
+    pq.insert(make_pair(0, make_pair(1, 0)));
+
+    while(!pq.empty()){
+        auto crt_first = pq.begin()->first;
+        auto crt_second_v= pq.begin()->second.first;
+        auto crt_second_layer = pq.begin()->second.second;
+        pq.erase(pq.begin());
+        for (auto nxt: g[crt_second_v]){
+            // nxt = {v, w}
+            if (dp[nxt.first][crt_second_layer] > crt_first + nxt.second){
+                auto it = pq.find(make_pair(dp[nxt.first][crt_second_layer], make_pair(nxt.first, crt_second_layer)));
+                if (it != pq.end()) pq.erase(it);
+                dp[nxt.first][crt_second_layer] = crt_first + nxt.second;
+                pq.insert(make_pair(crt_first + nxt.second, make_pair(nxt.first, crt_second_layer)));
+            }
+
+            if (crt_second_layer == 0 || crt_second_layer == 2)
+            if (dp[nxt.first][crt_second_layer + 1] > crt_first + nxt.second + nxt.second){
+                auto it = pq.find(make_pair(dp[nxt.first][crt_second_layer + 1], make_pair(nxt.first, crt_second_layer + 1)));
+                if (it != pq.end()) pq.erase(it);
+                dp[nxt.first][crt_second_layer + 1] = crt_first + nxt.second + nxt.second;
+                pq.insert(make_pair(crt_first + nxt.second + nxt.second, make_pair(nxt.first, crt_second_layer + 1)));
+            }
+
+            if (crt_second_layer == 0 || crt_second_layer == 1)
+            if (dp[nxt.first][crt_second_layer + 2] > crt_first){
+                auto it = pq.find(make_pair(dp[nxt.first][crt_second_layer + 2], make_pair(nxt.first, crt_second_layer + 2)));
+                if (it != pq.end()) pq.erase(it);
+                dp[nxt.first][crt_second_layer + 2] = crt_first;
+                pq.insert(make_pair(crt_first, make_pair(nxt.first, crt_second_layer + 2)));
+            }
+        }
+    }
+    
+    for (int i=2;i<=n;++i){
+        cout << min(dp[i][0], dp[i][3]) << " ";
+    }
+    cout << "\n";
+
+    return 0;
+}
