@@ -1,0 +1,68 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+const int N = 1e5 * 2 + 5;
+int n;
+
+int arr[N];
+int ans[N];
+
+int cnt[30];
+int cnt2[30];
+
+void cal(int i){
+    int t = 0;
+    while (i){
+        if (i & 1){
+            cnt[t]++;
+        }
+        i >>= 1;
+        t++;
+    }
+}
+
+void cal2(int i){
+    int t = 0;
+    while (i){
+        if (i & 1){
+            cnt2[t]++;
+        }
+        i >>= 1;
+        t++;
+    }
+}
+
+inline void update(int i){
+    for (int j=0;j<n;++j)
+        ans[j] ^= (1 << i);
+}
+
+int main(){
+    std::ios::sync_with_stdio(0), cin.tie(0), cout.tie(0);
+    cin>>n;
+
+    for (int i=0;i<n-1;++i)
+        cin>>arr[i];
+    
+    ans[0] = 0;
+    for (int i=1;i<=n;++i)
+        ans[i] = arr[i - 1] ^ ans[i - 1];
+
+    memset(cnt,0,sizeof(cnt));
+    memset(cnt2,0,sizeof(cnt2));
+
+    for (int i=0;i<n;++i)
+        cal(i);
+
+    for (int i=0;i<n;++i)
+        cal2(ans[i]);    
+
+    for (int i=0;i<30;i++)
+        if (cnt[i] != cnt2[i]) update(i);
+
+    for (int i=0;i<n;++i)
+        cout << ans[i] << " ";
+    cout <<'\n';
+    return 0;
+}
