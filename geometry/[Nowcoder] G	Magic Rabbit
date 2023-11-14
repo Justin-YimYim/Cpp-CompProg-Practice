@@ -1,0 +1,69 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+const double eps=1e-9;
+
+bool dcmp(double x){
+	if (fabs(x) <= eps) return true;
+	else return false;
+}
+
+struct point{
+    double x;
+    double y;
+	bool operator == (const point &p)
+    {
+        if (dcmp(x - p.x) && dcmp(y - p.y)) return true;
+        return false;
+    }    
+};
+
+struct vec{
+	double x, y;
+    vec(double &_x, double &_y): x(_x), y(_y){}
+    vec(point &a, point &b): x(b.x - a.x), y(b.y - a.y){} 
+};
+
+double cross(vec a, vec b) { return a.x * b.y - a.y * b.x; }
+
+bool ccw(point& p, point& q, point& r) {
+	return cross(vec(p, q), vec(p, r)) > 0; 
+}
+
+bool onLine(point &tmp, point &p1, point &p2){
+    if (dcmp(cross(vec(p1, p2), vec(p1, tmp)))){
+        double minx = min(p1.x, p2.x), maxx = max(p1.x, p2.x), miny = min(p1.y, p2.y), maxy = max(p1.y, p2.y);
+        if (tmp.x >= minx && tmp.x <= maxx && tmp.y >= miny && tmp.y <= maxy) return true;
+    }
+    return false;
+}
+
+bool onLineFail(point &tmp, point &p1, point &p2){
+    if (dcmp(cross(vec(p1, p2), vec(p1, tmp)))) return true;
+    else return false;
+}
+
+bool check(point& tmp, point& p1, point& p2, point& p3){
+    if (tmp == p1 || tmp == p2 || tmp == p3) return true;
+    if (onLine(tmp, p1, p2) || onLine(tmp, p2, p3) || onLine(tmp, p3, p1)) return true;
+    if (onLineFail(tmp, p1, p2) || onLineFail(tmp, p2, p3) || onLineFail(tmp, p3, p1)) return false;
+    if (ccw(tmp, p1, p2) == ccw(tmp, p2, p3) &&
+       ccw(tmp, p2, p3) == ccw(tmp, p3, p1) &&
+       ccw(tmp, p3, p1) == ccw(tmp, p1, p2))
+        return true;
+    else return false;
+}
+
+int main(){
+    point p1, p2, p3;
+    cin >> p1.x >> p1.y >> p2.x >> p2.y >> p3.x >> p3.y;
+    int n;
+    cin >> n;
+    while (n--){
+        point tmp;
+        cin >> tmp.x >> tmp.y;
+        if (check(tmp, p1, p2, p3)) cout << "YES\n";
+        else cout << "NO\n";
+    }
+}
