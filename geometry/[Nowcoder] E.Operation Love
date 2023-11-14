@@ -1,0 +1,105 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+const double eps=1e-5;
+
+bool dcmp(double x){
+    // cout << x << '\n';
+    if (fabs(x) <= eps) return 1;
+    else return 0;
+}
+
+struct point{
+    double x;
+    double y;
+    bool operator == (const point &b)
+    {
+       if (dcmp(x - b.x) && dcmp(y - b.y))
+          return true;
+      return false;
+    }
+};
+
+struct vec{
+	double x, y;
+    vec(double &_x, double &_y): x(_x), y(_y){}
+    vec(point &a, point &b): x(b.x - a.x), y(b.y - a.y){} 
+};
+
+struct segment{
+    point p1;
+    point p2;
+};
+
+double cross(vec a, vec b) { return a.x * b.y - a.y * b.x; }
+
+void solve(){
+    std::ios::sync_with_stdio(0), cin.tie(0), cout.tie(0);
+    point lastPoint;
+    segment base, col;
+    cin>>lastPoint.x;
+    cin>>lastPoint.y;
+    point firstPoint = lastPoint;
+    for (int i=1;i<20;++i){
+        point crtPoint;
+        cin>>crtPoint.x;
+        cin>>crtPoint.y;
+        double distance = pow(pow(crtPoint.x - lastPoint.x, 2) + pow(crtPoint.y - lastPoint.y, 2), 0.5);
+        if (dcmp(distance - 9)){
+            // cout << "9 here" << '\n'; 
+            base.p1 = crtPoint;
+            base.p2 = lastPoint;
+        }
+        
+        if (dcmp(distance - 8)){
+            // cout << "8 here" << '\n';
+            col.p1 = crtPoint;
+            col.p2 = lastPoint;
+        }
+        lastPoint = crtPoint;
+    }
+    double distance = pow(pow(firstPoint.x - lastPoint.x, 2) + pow(firstPoint.y - lastPoint.y, 2), 0.5);
+    if (dcmp(distance - 9)){
+        // cout << "9 here" << '\n';
+        base.p1 = firstPoint;
+        base.p2 = lastPoint;
+    }
+
+    if (dcmp(distance - 8)){
+        // cout << "8 here" << '\n';
+        col.p1 = firstPoint;
+        col.p2 = lastPoint;
+    }
+    point base1, same, col1;
+    if (base.p1 == col.p1){
+        base1 = base.p2;
+        same = base.p1;
+        col1 = col.p2;
+    }else if (base.p1 == col.p2){
+        base1 = base.p2;
+        same = base.p1;
+        col1 = col.p1;
+    }else if (base.p2 == col.p1){
+        base1 = base.p1;
+        same = base.p2;
+        col1 = col.p2;
+    }else{
+        base1 = base.p1;
+        same = base.p2;
+        col1 = col.p1;
+    }
+    vec v1(base1, same), v2(base1, col1);
+    if (cross(v1, v2) > 0)
+        cout << "right\n";
+    else
+        cout << "left\n";
+}
+
+int main(){
+    int t;
+    cin>>t;
+    while(t--){
+        solve();
+    }
+}
