@@ -1,0 +1,21 @@
+#include <bits/stdc++.h>
+#define int long long
+
+using namespace std;
+
+signed main(){
+    std::ios::sync_with_stdio(0), cin.tie(0), cout.tie(0);
+    int n;
+    cin>>n;
+    multimap<long double, pair<int, int> > mp;
+    while(n--){
+        int x, y;
+        cin>>x>>y;
+        if (x == 0 && y == 0) mp.insert({0, {0, 0}});
+        else if (y == 0) mp.insert({5, {x, 0}});
+        else mp.insert(make_pair(atan2l(y, x), make_pair(x, y)));
+    }
+    for (auto &a: mp)
+        cout << a.second.first << " " << a.second.second << '\n';
+    return 0;
+}
