@@ -1,0 +1,102 @@
+#include <bits/stdc++.h>
+#define int long long
+using namespace std;
+string s;
+const int mod = 998244353;
+
+struct unionFind{
+    vector<int> root;
+    unionFind(int n): root(n){
+        iota(root.begin(), root.end(), 0);
+        // for (auto &a: root) cout << a << " ";
+        // cout << "\n";
+    }
+
+    int findRoot(int n){
+        if (root[n] == n) return n;
+        else root[n] = findRoot(root[n]);
+        return root[n];
+    }
+
+    void merge(int i, int j){
+        int rootI(findRoot(i)), rootJ(findRoot(j));
+        root[rootJ] = rootI;
+        root[j] = rootI;
+    }
+};
+
+signed main(){
+    cin>>s;
+    int t(s.size()), ans(0);
+    for (int i = 0; i < s.size() - 1; ++i){
+        if (i < s.size() - i - 1 && s[s.size() - i - 1] == s[i]) continue;
+        unionFind uf(t + i + 1);
+        unordered_map<int, int> st;
+        int ptr1(0), ptr2(s.size() - 1);
+        while (ptr1 < ptr2){
+            uf.merge(ptr1, ptr2);
+            ptr1++;
+            ptr2--;
+        }
+        ptr1 = s.size(), ptr2 = s.size() + i;
+        while (ptr1 < ptr2){
+            uf.merge(ptr1, ptr2);
+            ptr1++;
+            ptr2--;
+        }
+        for (int j = 0;j<uf.root.size();++j){
+            int tmp = st.size();
+            if (st.find(uf.findRoot(j)) == st.end() )
+                st[uf.findRoot(j)] = tmp;
+        }
+        // cout << st.size() << '\n';
+        // for (auto &a: st) cout << a.first << " " << a.second << '\n';
+        unionFind uf2(st.size() * 2);
+        for (int j=0;j<=i;++j){
+            // cout << j << ": " << uf.findRoot(j) << " " << uf.findRoot(j + s.size()) << '\n';
+            if (s[j] == '1'){
+                int a = st[uf.findRoot(j)], b = st[uf.findRoot(j + s.size())];
+                uf2.merge(a, b + st.size());
+                uf2.merge(a + st.size(), b);
+            }
+            else if(s[j] == '0'){
+                int a = st[uf.findRoot(j)], b = st[uf.findRoot(j + s.size())];
+                uf2.merge(a, b);
+                uf2.merge(a + st.size(), b + st.size());
+            }
+        }
+
+        unordered_set<int> tmp;
+        unordered_set<int> fixed;
+        bool flag = false;
+
+        for (int j=i+1;j<s.size();j++) fixed.insert(st[uf.findRoot(j)]);
+        fixed.insert(st[uf.findRoot(s.size() + i)]);
+
+        for (int j=0;j<st.size();++j){
+            if (uf2.findRoot(j+st.size()) < st.size() && fixed.find(j) == fixed.end())
+                tmp.insert(uf2.findRoot(j+st.size()));
+            if (uf2.findRoot(j) == uf2.findRoot(j + st.size())){
+                flag = true;
+                break;
+            }
+        }
+
+        for (auto &a: tmp) cout << a << " ";
+        cout << '\n';
+        int add(1);
+        if (flag) continue;
+        else
+        for (int j = 0; j<tmp.size();++j) {
+            add <<= 1;
+            add %= mod;
+        }
+        
+
+        ans += add;  
+        ans %= mod;
+        cout << i << ": " << ans << '\n';
+    }
+    cout << ans << '\n';
+    return 0;
+}
