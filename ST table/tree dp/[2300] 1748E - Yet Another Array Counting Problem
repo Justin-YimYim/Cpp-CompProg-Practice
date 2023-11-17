@@ -1,0 +1,73 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+const int N=1e6+5,st=18,mod=1e9+7;
+int A[N],n,m,ST[18][N],msb[N];
+vector<vector<long long> > dp,sum;
+
+inline int getMin(int i, int j){
+    return A[i] >= A[j]? i: j;
+}
+
+inline int getRangeMax(int l, int r){
+    int bit=msb[r-l+1];
+    // cout << bit << " " << l << " " << r << '\n';
+    int i = ST[bit][l], j=ST[bit][r-(1<<bit)+1]; 
+    return getMin(i, j);
+}
+
+void buildST(){
+    for (int i=1;i<18;++i)
+    for (int j=1;j<=n;++j){
+        if (j + (1<<i) - 1 > n) break;
+        int index = getMin(ST[i-1][j], ST[i-1][j+(1<<(i-1))]);
+        ST[i][j] = index;
+        // cout << ST[i][j];
+    }
+}
+
+long long query(int l, int r){
+    if (l > r) return -1;
+
+    int mx=getRangeMax(l, r);
+    // cout << mx << " ";
+    long long lmx=query(l,mx-1),rmx=query(mx+1,r);
+    for (int i=1;i<=m;i++){
+        if (lmx != -1 && i==1) dp[mx][1]=0;
+        else dp[mx][i]=(lmx>0?sum[lmx][i-1]:1ll)*(rmx>0?sum[rmx][i]:1ll)%mod;
+
+        sum[mx][i] = (sum[mx][i-1]+ dp[mx][i])%mod;
+    }
+    return mx;
+}
+
+void solve(){
+    cin>>n>>m;
+    for (int i=1;i<=n;++i)
+        cin>>A[i];
+
+    for (int i=1;i<=n;++i)
+        ST[0][i] = i;
+    
+    buildST();
+
+    dp = vector<vector<long long> > (n + 5, vector<long long> (m + 5, 0));
+    sum = vector<vector<long long> > (n + 5, vector<long long> (m + 5, 0));
+
+    query(1, n);
+    cout << sum[getRangeMax(1, n)][m] << '\n';
+}
+
+int main(){
+    int t;
+    cin>>t;
+    msb[1] = 0;
+    for (int i=2;i<=N;++i)
+        msb[i]=msb[i-1]+((i&(i-1))==0);     
+
+    while(t--)
+        solve();
+
+    return 0;
+}
