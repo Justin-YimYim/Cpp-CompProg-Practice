@@ -1,0 +1,113 @@
+#include <bits/stdc++.h>
+#define int long long
+#define double long double
+
+using namespace std;
+ 
+const long long eps=0;
+const double PI=3.1415926535897932384l;
+ 
+template<typename T> struct point
+{
+    T x,y;
+ 
+    bool operator==(const point &a) const {return (abs(x-a.x)<=eps && abs(y-a.y)<=eps);}
+    bool operator<(const point &a) const {if (abs(x-a.x)<=eps) return y<a.y-eps; return x<a.x-eps;}
+    point operator+(const point &a) const {return {x+a.x,y+a.y};}
+    point operator-(const point &a) const {return {x-a.x,y-a.y};}
+    point operator-() const {return {-x,-y};}
+    point operator*(const T k) const {return {k*x,k*y};}
+    point operator/(const T k) const {return {x/k,y/k};}
+    T operator*(const point &a) const {return x*a.x+y*a.y;} //Dot
+    T operator^(const point &a) const {return x*a.y-y*a.x;} //Cross
+    int toleft(const point &a) const {auto t=(*this)^a; return (t>eps)-(t<-eps);}
+    T len2() const {return (*this)*(*this);}
+    T dis2(const point &a) const {return (a-(*this)).len2();}
+    double len() const {return sqrt(len2());}
+    double dis(const point &a) const {return sqrt(dis2(a));}
+    double ang(const point &a) const {return acos(max(-1.0,min(1.0,((*this)*a)/(len()*a.len()))));}
+    // point rot(const double rad) const {return {x*cos(rad)-y*sin(rad),x*sin(rad)+y*cos(rad)};}
+    point(T X, T Y): x(X), y(Y){}
+    point rot() {return point(-y, x);};
+};
+ 
+using Point=point<long long>;
+
+struct argcmp
+{
+    bool operator () (const Point &a, const Point &b) const
+    {
+        const auto quad=[](const Point &a)
+        {
+            if(a.y<-eps) return 1;
+            if(a.y>eps) return 4;
+            if(a.x<-eps) return 5;
+            if(a.x>eps) return 3;
+            return 2;
+        };
+        const int qa=quad(a), qb=quad(b);
+        if(qa!=qb) return qa<qb;
+        const auto t=a^b;
+        return t>eps;
+    }
+};
+
+int n;
+vector<Point> Points;
+
+long long solve(const Point& a){
+    vector<Point> cnt;
+    for (int i=0;i<n;i++)
+    {
+        if (Points[i] == a) continue;
+        cnt.push_back(Points[i]-a);
+    }
+    sort(cnt.begin(), cnt.end(), argcmp());
+    int len=cnt.size();
+    // cout << "len:" << len << '\n';
+    cnt.insert(cnt.end(), cnt.begin(), cnt.end());
+     
+    int ans=0;
+    for(int i=0, l=0, r=0;i<len;i++)
+    {
+        l = max(l, i), r = max(r, i);
+        auto check1 = [&](Point a, Point b, int idr1) {
+            if ((a * b) > 0) {
+                if ((a ^ b) != 0) return (a ^ b) > 0;
+                return idr1 < len;
+            }
+            return false;
+        };
+        auto check2 = [&](Point a, Point b, int idr2) {
+            if ((a ^ b) != 0) return (a ^ b) > 0;
+            if ((a * b) > 0) return idr2 < len;
+            return idr2 < len;
+        };
+        
+        while (l + 1 < 2 * len && check1(cnt[i], cnt[l + 1], l + 1)) l++;
+        while (r + 1 < 2 * len && check2(cnt[i], cnt[r + 1], r + 1)) r++;
+        
+        ans+= (r - l);
+        // cout<<"i="<<i<<"  l="<<l<<"   r="<<r<<"   sum="<<sum<<"   cnt="<<ct<<"   ans="<<ans<<endl;
+    }
+    return ans;
+}
+
+signed main(){
+    while (cin>>n){
+        long long ans=n*(n-1)/2 *(n-2)/3;
+        for (int i=0;i<n;++i){
+            int x, y;
+            cin>>x>>y;
+            Points.push_back(Point(x,y));
+        }
+        long long invalid(0);
+        for (int i=0;i<n;++i){
+            invalid += solve(Points[i]);
+        }
+
+        cout << ans - invalid << '\n';
+        Points.clear();
+    }
+    return 0;
+}
