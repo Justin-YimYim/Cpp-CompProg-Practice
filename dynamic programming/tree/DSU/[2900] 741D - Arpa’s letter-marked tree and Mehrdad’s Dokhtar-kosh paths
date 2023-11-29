@@ -1,0 +1,100 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+struct edge{
+    int v, last;
+};
+
+const int N=5e5+5;
+int head[N];
+edge edges[N*2];
+int cnt=0;
+
+void insert(int x, int v){
+    int last=head[x];
+    head[x]=++cnt;
+    edges[cnt].v=v;
+    edges[cnt].last=last;
+}
+
+int son[N], siz[N], dep[N], Ans[N], ct[1<<22], ch[N];
+
+void dfs(int u, int p){
+    siz[u]=1;
+    for (int it=head[u];it;it=edges[it].last){
+        if (edges[it].v==p)continue;
+        ch[edges[it].v]^=ch[u];
+        dep[edges[it].v] = dep[u]+1;
+        dfs(edges[it].v, u);
+        siz[u]+=siz[edges[it].v];
+        if (siz[edges[it].v] > siz[son[u]]) son[u]=edges[it].v; 
+    }
+}
+
+void clean(int u, int p){
+    ct[ch[u]]=INT_MIN;
+    for (int i=head[u];i;i=edges[i].last) 
+        if (edges[i].v != p)
+            clean(edges[i].v, u);
+}
+
+void addLight(int u, int p){
+    ct[ch[u]]=max(ct[ch[u]], dep[u]);
+    for (int it=head[u];it;it=edges[it].last)
+        if (edges[it].v != p)
+            addLight(edges[it].v, u);
+}
+int rt;
+
+void cal(int u, int p){
+    Ans[rt]=max(Ans[rt], dep[u] + ct[ch[u]]);
+    for (int i=0;i<=21;++i) Ans[rt]=max(Ans[rt], dep[u] + ct[(1 << i) ^ ch[u]]);
+    for (int it=head[u];it;it=edges[it].last) 
+        if (edges[it].v != p)
+            cal(edges[it].v,u);
+}
+
+void dfs2(int u, int p){
+    for (int it=head[u];it;it=edges[it].last)
+        if (edges[it].v!=p && edges[it].v!= son[u])
+            dfs2(edges[it].v, u), clean(edges[it].v,u);
+        
+    if (son[u]) dfs2(son[u], u);
+    rt=u;
+
+    for (int it=head[u];it;it=edges[it].last)
+        if (edges[it].v!=p && edges[it].v!= son[u])
+            cal(edges[it].v,u), addLight(edges[it].v,u);
+
+    ct[ch[u]]=max(ct[ch[u]], dep[u]);
+    Ans[u]=max(Ans[u], dep[u] + ct[ch[u]]);
+
+
+    for (int i=0;i<=21;i++) Ans[u]=max(Ans[u], dep[u] + ct[(1<<i) ^ ch[u]]);
+    Ans[u] -= dep[u] * 2;
+
+    for (int it=head[u];it;it=edges[it].last) 
+        if (edges[it].v!=p)
+            Ans[u]=max(Ans[u],Ans[edges[it].v]);
+}
+
+signed main(){
+    std::ios::sync_with_stdio(0), cin.tie(0), cout.tie(0);
+    int n;
+    cin>>n;
+    for (int i=2;i<=n;++i){
+        int v;
+        char c;
+        cin>>v>>c;
+        insert(i,v);
+        insert(v,i);
+        ch[i]=1<<(c-'a');
+    }
+
+    memset(ct, 0x80, sizeof(ct));
+    dfs(1,0);
+    dfs2(1,0);
+
+    for (int i=1;i<=n;++i) cout << Ans[i] << ' ';
+    return 0;
+}
