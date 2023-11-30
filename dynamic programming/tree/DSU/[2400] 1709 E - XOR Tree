@@ -1,0 +1,112 @@
+#include <bits/stdc++.h>
+#define int long long
+using namespace std;
+
+const int N = 2e5 + 5;
+int n, arr[N];
+
+struct edge{
+    int v, last;
+};
+
+edge edges[2*N];
+int head[N];
+int cnt=0;
+
+void insert(int u, int v){
+    int last=head[u];
+    head[u]=++cnt;
+    edges[cnt].v = v;
+    edges[cnt].last = last;
+}
+
+int siz[N], son[N], ch[N], rt, Ans[N];
+void dfs1(int u, int p){
+    siz[u]=1;
+    for (int it=head[u];it;it=edges[it].last){
+        if (edges[it].v == p) continue;
+        ch[edges[it].v]^=ch[u];
+        dfs1(edges[it].v, u), siz[u]+=siz[edges[it].v];
+        if (siz[edges[it].v]>siz[son[u]]) son[u]=edges[it].v;
+    }
+}
+
+bool added(false);
+map<int, int> ct;
+
+void addLight(int u, int p){
+    if (ch[u] == (1ll<<32)) return;
+    ct[ch[u]]++;
+    for (int it=head[u];it;it=edges[it].last)
+        if (edges[it].v!=p)
+            addLight(edges[it].v, u);
+}
+
+void chk(int u, int p){
+    if (ch[u] == (1ll<<32)) return;
+    if (ct.find(ch[u] ^ arr[rt]) != ct.end()) {
+        added=true;
+        return;
+    }
+    for (int it=head[u];it;it=edges[it].last)
+        if (edges[it].v!=p)
+            chk(edges[it].v, u);
+}
+void dfs2(int u, int p){
+    for (int it=head[u];it;it=edges[it].last)
+        if (edges[it].v != p && edges[it].v != son[u]) 
+            dfs2(edges[it].v, u), ct.clear();
+
+    added = false;
+    if (son[u]) {
+        dfs2(son[u], u);
+        Ans[u]=Ans[son[u]];
+        if (arr[u] == arr[son[u]])
+            added = true;
+    }
+    
+    rt = u;
+    for (int it=head[u];it;it=edges[it].last)
+        if (edges[it].v != p && edges[it].v != son[u]) 
+            {
+                Ans[u] += Ans[edges[it].v];
+                chk(edges[it].v,u);
+                if (!added){
+                    addLight(edges[it].v, u);
+                    if (arr[u] == arr[edges[it].v])
+                        added=true;
+                }
+            }
+            
+    if (added || ct.find(ch[u] ^ arr[u]) != ct.end()) {
+        Ans[u]++;
+        ch[u] = 1ll<<32;
+        arr[u] = 1ll<<32;
+        ct.clear();
+    }
+    else{
+        ct[ch[u]]++;
+    }
+    added = false;
+}
+
+signed main(){
+    std::ios::sync_with_stdio(0), cin.tie(0);
+    cin>>n;
+    for (int i=1;i<=n;++i){
+        cin>>arr[i];
+        ch[i]=arr[i];
+    }
+    for (int i=1;i<n;++i){
+        int u,v;
+        cin>>u>>v;
+        insert(u,v);
+        insert(v,u);
+    }
+
+    dfs1(1,0);
+    dfs2(1,0);
+    cout << Ans[1] << '\n';
+    return 0;
+}
+
