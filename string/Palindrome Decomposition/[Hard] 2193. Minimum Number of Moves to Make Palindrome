@@ -1,0 +1,25 @@
+class Solution {
+public:
+    int minMovesToMakePalindrome(string s) {
+        int st=0, end=s.size()-1,cnt=0;
+        while (st<end){
+            if (s[st] != s[end]){
+                int i=end;
+                while (i>st && s[i]!= s[st]) i--;
+                if (i == st) {
+                    swap(s[st], s[st+1]);
+                    cnt++;
+                }
+                else {
+                    while(i<end){
+                        swap(s[i], s[i+1]);
+                        cnt++, i++;
+                    }
+                    st++, end--;
+                }
+            }
+            else st++, end--;
+        }
+        return cnt;
+    }
+};
