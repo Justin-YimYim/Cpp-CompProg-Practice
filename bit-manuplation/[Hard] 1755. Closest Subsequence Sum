@@ -1,0 +1,39 @@
+class Solution {
+public:
+    int minAbsDifference(vector<int>& nums, int goal) {
+        if (nums.size() == 1) return min(abs(goal), abs(nums[0] - goal));
+        
+        int mid=nums.size()/2;
+        long long ans{LLONG_MAX};
+        vector<long long> v1{0}, v2{0};
+        for (int i=0;i<mid;++i) {
+            int n = v1.size();
+            for (int j=0;j<n;++j)
+                v1.push_back(v1[j]+nums[i]);
+        }
+            
+        for (int i=mid;i<nums.size();++i){
+            int n = v2.size();
+            for (int j=0;j<n;++j)
+                v2.push_back(v2[j]+nums[i]);
+        }   
+
+        sort(v1.begin(), v1.end());
+        sort(v2.begin(), v2.end());
+
+        for (auto &a: v1) ans = min(ans, abs(goal - a));
+        for (auto &a: v2) ans = min(ans, abs(goal - a));
+
+        for (auto &a: v1) {
+            auto ptr = lower_bound(v2.begin(), v2.end(), goal-a);
+            if (ptr == v2.begin()) ans = min(ans, abs(goal - (a + *ptr)));
+            else if (ptr == v2.end()) ans = min(ans, abs(goal - (a + *prev(ptr))));
+            else{
+                ans = min(ans, abs(goal - (a + *ptr)));
+                ans = min(ans, abs(goal - (a + *prev(ptr))));
+            }
+        }
+
+        return ans;
+    }
+};
