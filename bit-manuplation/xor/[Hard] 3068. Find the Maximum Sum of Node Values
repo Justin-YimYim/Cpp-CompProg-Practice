@@ -1,0 +1,19 @@
+class Solution {
+public:
+    long long maximumValueSum(vector<int>& nums, int k, vector<vector<int>>& edges) {
+        vector<long long> v1, v2;
+        long long tmp = 0, mn=LLONG_MAX;
+        for (auto &a: nums){
+            mn = min(mn, abs(a - (a^k)) + 0LL);
+            if (a - (a ^ k) > 0){
+                tmp += a;
+                v1.push_back(a);
+            }else{
+                tmp += (a ^ k );
+                v2.push_back(a ^ k);
+            }
+        }
+        if ((v2.size() & 1) == 0) return tmp;
+        return tmp - mn;
+    }
+};
