@@ -1,0 +1,24 @@
+class Solution {
+public:
+    double mincostToHireWorkers(vector<int>& quality, vector<int>& wage, int k) {
+        vector<pair<double, int> > v;
+        for (int i=0;i<quality.size();++i)
+            v.push_back({1.0 * wage[i]/quality[i], quality[i]});
+        sort(v.begin(), v.end());
+        priority_queue<int> pq;
+        long sm=0;
+        double ans=DBL_MAX;
+        for (auto &a: v){
+            sm+=a.second;
+            pq.push(a.second);
+            if (pq.size() > k){
+                sm-=pq.top();
+                pq.pop();
+            }
+            if (pq.size()==k)
+                ans = min(ans, a.first * sm);
+            
+        }
+        return ans;
+    }
+};
