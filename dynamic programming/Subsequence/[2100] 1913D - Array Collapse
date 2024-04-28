@@ -1,0 +1,45 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+#define mod 998244353
+
+int st[300005], top, sum;
+int f[300005], a[300005], pre[300005];
+
+void solve(){
+    int n; 
+    cin>>n;
+    for (int i=1;i<=n;++i) cin>>a[i];
+    sum=0;
+    f[0] = 1;
+    pre[1] = 1;
+    a[0] = INT_MAX;
+    top = 0;
+    for (int i=1;i<=n;++i){
+        while (top > 0 && a[i] < a[st[top]]) sum=(sum-f[st[top--]]+mod)%mod;
+        f[i]=(pre[i-1]-pre[st[top]]+mod)%mod;
+        if (top==0)f[i]=(f[i]+1)%mod;
+        f[i]=(f[i]+sum)%mod;
+        sum=(sum+f[i])%mod;
+        st[++top]=i;
+        pre[i]=(pre[i-1]+f[i])%mod;
+    }
+
+    int mn=INT_MAX, ans=0;
+    for (int i=n;i>=1;--i){
+        if (a[i]<mn) ans=(ans+f[i])%mod;
+        mn=min(mn,a[i]);
+    }
+    cout << ans << '\n';
+}
+
+int main(){
+    std::ios::sync_with_stdio(), cin.tie(0), cout.tie(0);
+    int t;
+    cin >> t;
+    while (t--){
+        solve();
+    }
+    return 0;
+}
