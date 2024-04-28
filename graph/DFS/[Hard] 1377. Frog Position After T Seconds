@@ -1,0 +1,39 @@
+class Solution {
+public:
+    vector<int> vertices[101];
+    double frogPosition(int n, vector<vector<int>>& edges, int t, int target) {
+        if (n == 1) return 1;
+        for (auto &a: edges){
+            vertices[a[0]].push_back(a[1]);
+            vertices[a[1]].push_back(a[0]);
+        }
+
+        vector<int> path{1};
+        findPath(target, path, 0);
+        if (path.size() > t + 1) return 0;
+        if (path.size() == 1 && t >= 1) return 0;
+        long double ans = 1.0;
+        auto it = path.begin();
+        while (t--){
+            if (it != (path.end() - 1) && vertices[*it].size() > 1){
+                if ((*it) == 1)ans /= vertices[*it].size();
+                else ans /= (vertices[*it].size() - 1);
+                it++;
+            }else if (it != (path.end() - 1)) it++;
+            else if (vertices[*it].size() > 1) return 0;
+        }
+        return ans;
+    }
+
+    bool findPath(int &target, vector<int> &path, int prev){
+        auto lt = *(path.rbegin());
+        for (auto &a: vertices[lt]){
+            if (a == prev) continue;
+            path.push_back(a);
+            if (a == target) return true;
+            if (!findPath(target, path, lt)) path.pop_back();
+            else return true;
+        }
+        return false;
+    }
+};
