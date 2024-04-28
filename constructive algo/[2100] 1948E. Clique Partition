@@ -1,0 +1,33 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+void solve(){
+    int n, k, rg;
+    cin >> n >>k;
+    rg = k - 1;
+    int low = 1, high = min(n, 1 + rg);
+    while (high <= n){
+        for (int i = (high + low) / 2; i >= low; i--) cout << i << " ";
+        for (int i = high; i > (high + low) / 2; i--) cout << i << " ";
+        if (high == n) break;
+        else high = min(n, high + 1 + rg);
+        low += rg + 1;
+    }
+    cout << '\n';
+    cout << n / (rg + 1) + (n % (rg + 1)? 1: 0) << '\n';
+    int i = 0;
+    while (++i <= n)
+        cout << i / (rg + 1) + (i % (rg + 1)? 1: 0) << " ";
+    
+    cout <<'\n';
+}
+
+int main(){
+    std::ios::sync_with_stdio(0), cin.tie(0), cout.tie(0);
+    int t;
+    cin >> t;
+    while (t--){
+        solve();
+    }
+}
