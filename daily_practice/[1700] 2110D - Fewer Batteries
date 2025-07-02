@@ -1,0 +1,79 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+struct edge{
+	int y, last_edge;
+	long long weight;
+};
+
+constexpr int N = 2e5 + 5;
+constexpr int M = 3e5 + 5;
+long head[N];
+edge Edges[M];
+long edge=0;
+void insertEdge(int x, int y, long long weight){
+	int last_edge = head[x];
+	head[x] = ++edge;
+	Edges[edge].y = y;
+	Edges[edge].last_edge = last_edge;
+	Edges[edge].weight = weight;
+}
+
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    int t;
+    cin >> t;
+    while (t--){
+        int n, m;
+        cin >> n >> m;
+        long long dp[n+1], b[n+1];
+        auto sizedp = sizeof(dp);
+        for (int i=1;i<=n;++i) cin>>b[i];
+
+        
+        edge = 0;
+        memset(head, 0xff, sizeof(head));
+        for (int i=0;i<m;++i){
+            int s, t;
+            long long w;
+            cin >> s >> t >> w;
+            insertEdge(s, t, w);
+        }
+        
+        auto chk = [&](long long mid){
+            memset(dp, 0xff, sizedp);
+            dp[1]=0;
+            
+            for (int i=1;i<=n;++i){
+                if (dp[i]==-1)continue;
+                long start = head[i];
+                while (start != -1){
+                    auto edge = Edges[start];
+                    if (edge.weight <= mid && b[i] + dp[i] >= edge.weight) dp[edge.y] = min(mid, b[i] + dp[i]);
+                    start = edge.last_edge;
+                }        
+            }
+            return dp[n];
+        };
+
+        if (chk(1e9+5) == -1) {
+            cout << -1 << endl;
+            continue;
+        }
+
+        int l = 0, r = 1e9+5, ans = -1;
+        while (l < r) {
+            int mid = (l + r) / 2;
+            if (chk(mid) != -1) {
+                ans = mid;
+                r = mid;
+            } else {
+                l = mid + 1;
+            }
+        }
+        cout << ans << endl;
+    }
+    return 0;
+}
