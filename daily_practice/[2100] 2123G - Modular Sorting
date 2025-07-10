@@ -1,0 +1,83 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+// 1. Notice when gcd(m, k) = 1. a[i] could be any value --> always true
+// 2. when gcd(m, k) != 1. a[i] would be in (a[i] mod gcd(m, k) * x)
+// 3. For each factor, we could precompute the largest value of the greediest allocation
+//  a. the neighbour result value would not be larger than gcd(m, k)
+//  b. each update only affect the current value and next value 
+//      --> the effect on largest value is noticeable
+
+int gcd(int m, int k){
+    if (m % k == 0) return k;
+    return gcd(k, m % k);
+}
+
+int mod(int a, int m){
+    return (a % m + m) % m;
+}
+
+void solve(){
+    int n, m, q;
+    cin >> n >> m >> q;
+    int a[n+1];
+    vector<int> fac;
+    a[0]=0;
+    for (int i=1;i<=n;++i) {
+        cin>>a[i];
+    }
+
+    {
+        int i=1;
+        for (;i*i<m;++i) if (m%i==0)fac.push_back(i), fac.push_back(m/i); 
+        if (i*i==m) fac.push_back(i);
+    }
+    
+    sort(fac.begin(), fac.end());
+
+    vector<long long> sz(fac.size(), 0);
+    for (int j=0;j<sz.size();++j)
+        for (int k=1;k<=n;++k)
+            sz[j] += ((a[k] % fac[j] + fac[j]) - (a[k-1] % fac[j])) % fac[j];
+
+    while (q--){
+        int t;
+        cin >> t;
+        if (t == 1){
+            int i, x;
+            cin >> i >> x;
+            for (int j=0;j<sz.size();++j){
+                int old_ps, new_ps;
+                old_ps = ((a[i] % fac[j] + fac[j]) - (a[i - 1] % fac[j])) % fac[j];
+                if (i < n)
+                    old_ps += ((a[i + 1] % fac[j] + fac[j]) - (a[i] % fac[j])) % fac[j];
+            
+                new_ps = ((x % fac[j] + fac[j]) - (a[i - 1] % fac[j])) % fac[j];
+                if (i < n)
+                   new_ps += ((a[i + 1] % fac[j] + fac[j]) - (x % fac[j])) % fac[j];
+                sz[j] += (new_ps - old_ps);
+            }
+            a[i]=x;
+        }else{
+            int k, g;
+            cin >> k;
+            g = gcd(m, k);
+            auto diff = distance(fac.begin(), lower_bound(fac.begin(), fac.end(), g));
+            if (*(sz.begin() + diff) >= m) cout << "NO\n";
+            else cout << "YES\n";
+        }
+    }
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    cout.tie(0);
+    int t;
+    cin >> t;
+    while (t--) {
+        solve();
+    }
+    return 0;
+}
