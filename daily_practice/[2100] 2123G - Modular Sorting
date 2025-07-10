@@ -14,10 +14,6 @@ int gcd(int m, int k){
     return gcd(k, m % k);
 }
 
-int mod(int a, int m){
-    return (a % m + m) % m;
-}
-
 void solve(){
     int n, m, q;
     cin >> n >> m >> q;
