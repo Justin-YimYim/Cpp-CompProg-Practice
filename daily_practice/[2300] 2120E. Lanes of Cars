@@ -1,0 +1,72 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+// dp先提公式
+// 處理剩下的東西 --> a[i] < l 數量 vs a[i] > l + k數量等
+
+bool check(long long target, long long arr[], long long sz, long long k) {
+  long long tmp = 0LL;
+  for (long long i = 0LL; i < sz; ++i)
+    tmp += max(0LL, arr[i] - target - k) - max(0LL, target - arr[i]);
+
+  if (tmp >= 0LL)
+    return true;
+  return false;
+}
+
+void solve() {
+  long long n, k;
+  cin >> n >> k;
+  long long a[n];
+  for (long long i = 0LL; i < n; ++i)
+    cin >> a[i];
+  sort(a, a + n);
+  long long low = a[0], high = 1e6 + 10LL, md;
+
+  while (low + 1 < high) {
+    md = (low + high) >> 1;
+    if (check(md, a, n, k)) {
+      low = md;
+    } else {
+      high = md;
+    }
+  }
+
+  long long cnt = 0LL, tmp = 0LL, tmp1 = 0LL, ans = 0LL;
+  for (long long i = 0LL; i < n; ++i) {
+    tmp += max(0LL, a[i] - low - k);
+    tmp1 += max(0LL, low - a[i]);
+    cnt += (a[i] > low + k);
+    if (a[i] < low)
+      a[i] = low;
+    if (a[i] > low + k)
+      a[i] = low + k;
+  }
+
+  tmp -= tmp1;
+  ans += (tmp1 * k);
+  for (long long i = 0LL; i < min(cnt, tmp); ++i)
+    a[n - 1 - i]++;
+  tmp -= cnt;
+  for (long long i = 0LL; i < max(0LL, tmp); ++i) {
+    a[i]++;
+    ans += k;
+  }
+  for (long long i = 0LL; i < n; ++i) {
+    ans += (a[i] * (a[i] + 1)) >> 1;
+  }
+
+  cout << ans << '\n';
+}
+
+int main() {
+  ios::sync_with_stdio(0LL);
+  cin.tie(0LL);
+  cout.tie(0LL);
+  long long t;
+  cin >> t;
+  while (t--)
+    solve();
+  return 0LL;
+}
