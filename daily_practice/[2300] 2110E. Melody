@@ -1,0 +1,99 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+// solving using Hierholzer + pseudo-adjcency lists
+// 1. check euler path --> cnt[odd degree] <= 2
+// 2. dfs from root recursively
+//  a. use weight and ^ 1 to mark used path
+//  b. Hierhozler's = dfs in reverse order, the first dfs node must be an end
+//  node
+// 3. pseudo-adjcency lists cannot erase in dfs --> so need to go through the
+// whole list in each list
+// https://blog.csdn.net/m0_72410588/article/details/130759894
+
+struct Edge {
+  int v, last;
+  bool used;
+};
+
+const int N = 2e5 + 10;
+Edge edges[2 * N];
+int idx[2 * N];
+int idx_to_point[2 * N];
+int cnt_edges;
+
+vector<int> ans;
+
+inline void add_edges(int p1, int p2) {
+  edges[++cnt_edges] = (Edge){p2, idx[p1], 0};
+  idx[p1] = cnt_edges;
+  edges[++cnt_edges] = (Edge){p1, idx[p2], 0};
+  idx[p2] = cnt_edges;
+}
+
+void dfs(int v) {
+  for (int e = idx[v]; e != -1; e = edges[e].last) {
+    if (!edges[e].used) {
+      edges[e].used = 1;
+      edges[e ^ 1].used = 1;
+      dfs(edges[e].v);
+      ans.push_back((e >> 1) + 1);
+    }
+  }
+}
+
+void solve() {
+  int n, cnt_point = -1;
+  ans.clear();
+  cnt_edges = -1;
+  cin >> n;
+  ans.reserve(n + 10);
+  map<int, int> point_to_idx, point_deg;
+  for (int i = 1; i <= n; ++i) {
+    int p1, p2;
+    cin >> p1 >> p2;
+    p2 += 1e9;
+    idx_to_point[++cnt_point] = p1;
+    idx[cnt_point] = -1;
+    if (point_to_idx.count(p1) == 0)
+      point_to_idx[p1] = cnt_point;
+    point_deg[p1]++;
+    idx_to_point[++cnt_point] = p2;
+    idx[cnt_point] = -1;
+    if (point_to_idx.count(p2) == 0)
+      point_to_idx[p2] = cnt_point;
+    point_deg[p2]++;
+    add_edges(point_to_idx[p1], point_to_idx[p2]);
+  }
+  int odd_deg = 0, root = point_to_idx[point_deg.begin()->first];
+  for (auto &a : point_deg) {
+    if (a.second & 1) {
+      ++odd_deg;
+      root = point_to_idx[a.first];
+    }
+  }
+  dfs(root);
+  if (odd_deg > 2 || ans.size() != n) {
+    cout << "NO\n";
+    return;
+  }
+
+  cout << "YES\n";
+  for (int i = 0; i < n; ++i)
+    cout << ans[i] << ' ';
+
+  cout << '\n';
+}
+
+int main() {
+  ios::sync_with_stdio(0);
+  cin.tie(0);
+  cout.tie(0);
+  int t;
+  cin >> t;
+  while (t--) {
+    solve();
+  }
+  return 0;
+}
