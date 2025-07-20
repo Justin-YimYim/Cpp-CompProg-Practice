@@ -1,0 +1,80 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+// let a < b < c
+// b = ma + n
+// f(a, b) = a + b mod a = a + n
+// f(a, c) = a + c mod a = a + k
+// f(b, c) = b + c mod b = b + y
+
+// for f(b, c) >= f(a, b) --> b + y >= a + n --> y >= a + n - (ma + n)
+// y >= 0 ==> always true
+
+// for f(a, c) > f(b, c) --> a + k > b + y -->  a + k > ma + n + y
+// if m == 1 --> k > n + y --> c mod a > b mod a  + c mod b
+// if 2b > c --> c mod b + b mod a == c mod a
+// when 2b < c --> recaclulate --> a_i < 10^9 --> at most recalculate limited
+// times
+
+// if original max f(x, y) not include largest value a_max --> f(y, a_max) will
+// be larger --> largest = f(x,  a_max)
+
+const int N = 1e6 + 5;
+int a[N];
+
+void solve() {
+  int n, b = 0, c, ans = 0;
+  set<int> possible;
+  cin >> n;
+  for (int i = 0; i < n; ++i)
+    cin >> a[i];
+
+  possible.insert(a[0]);
+  c = a[0];
+  cout << ans << ' ';
+
+  for (int i = 1; i < n; ++i) {
+    if (possible.find(a[i]) != possible.end()) {
+      cout << ans << ' ';
+      continue;
+    }
+
+    possible.insert(a[i]);
+    if (a[i] > c) {
+      b = c;
+      c = a[i];
+      ans = c % b + b % c;
+      if (a[i] >= 2 * b) {
+        auto mid = possible.lower_bound(b / 2);
+        while (mid != possible.end()) {
+          auto tmp = c % (*mid) + (*mid) % c;
+          if (tmp > ans) {
+            b = *mid;
+            ans = tmp;
+          }
+          mid++;
+        }
+      }
+    } else {
+      if (c % a[i] + a[i] > ans) {
+        b = a[i];
+        ans = c % a[i] + a[i];
+      }
+    }
+    cout << ans << ' ';
+  }
+  cout << '\n';
+}
+
+int main() {
+  ios::sync_with_stdio(false);
+  cin.tie(0);
+  cout.tie(0);
+  int t;
+  cin >> t;
+  while (t--) {
+    solve();
+  }
+  return 0;
+}
