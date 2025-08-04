@@ -1,0 +1,117 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+int n, res;
+pair<int, int> pairs;
+string ans;
+map<int, int> vals;
+vector<int> cnt;
+
+void pre_process() {
+  int sum = 0, tmp;
+  for (int i = 1; i <= 130; ++i) {
+    tmp = i * (i + 1) / 2;
+    if (tmp > sum) {
+      sum += tmp;
+      cnt.push_back(i);
+    }
+  }
+  for (int i = 1; i <= 4096; ++i) {
+    int tmp = 0, ps = 0;
+    for (int j = 1; j <= 12; ++j)
+      if ((1 << (j - 1)) & i)
+        ps += cnt[j - 1] * (cnt[j - 1] + 1) / 2;
+    vals[ps] = i;
+  }
+}
+
+void ask(int l, int r) {
+  cout << "? " << (r - l + 1) << ' ';
+  for (int i = l; i <= r; ++i)
+    cout << i << ' ';
+  cout << '\n';
+  cout.flush();
+  cin >> res;
+}
+
+pair<int, int> search() {
+  int l = 1, r = n, mid, last_r;
+  ask(l, r);
+  if (res == 0)
+    return {n, 1};
+  if (n == 2)
+    return {1, 2};
+
+  while (r - l != 1 || res != 1) {
+    if (res >= 1) {
+      last_r = r;
+      r = ((l + r) >> 1);
+    } else {
+      l = r;
+      r = ((last_r + l) >> 1) + ((last_r + l) & 1);
+    }
+    ask(l, r);
+  }
+  return {l, r};
+}
+
+void construct(int l, int r) {
+  vector<int> p;
+  cout << "? ";
+  for (int i = l; i <= r; ++i) {
+    int tmp = cnt[i - l];
+    while (tmp--) {
+      p.push_back(i);
+      p.push_back(pairs.second);
+    }
+    p.push_back(pairs.second);
+  }
+  cout << p.size() << ' ';
+  for (auto &a : p)
+    cout << a << ' ';
+  cout << '\n';
+  cout.flush();
+  cin >> res;
+}
+
+void solve() {
+  ans.clear();
+  cin >> n;
+  pairs = search();
+  int i = 1;
+  for (; i < n - (n % 12); i += 12) {
+    construct(i, i + 11);
+    int tmp = vals[res];
+    for (int j = 0; j < 12; j++) {
+      if ((1 << j) & tmp)
+        ans.push_back('(');
+      else
+        ans.push_back(')');
+    }
+  }
+  if (n % 12) {
+    construct(i, i + (n % 12) - 1);
+    int tmp = vals[res];
+    for (int j = 0; j < (n % 12); j++) {
+      if ((1 << j) & tmp)
+        ans.push_back('(');
+      else
+        ans.push_back(')');
+    }
+  }
+  cout << "! " << ans << '\n';
+  cout.flush();
+}
+
+int main() {
+  ios::sync_with_stdio(0LL);
+  cin.tie(0LL);
+  cout.tie(0LL);
+  pre_process();
+  long long t;
+  cin >> t;
+  while (t--)
+    solve();
+  return 0LL;
+}
