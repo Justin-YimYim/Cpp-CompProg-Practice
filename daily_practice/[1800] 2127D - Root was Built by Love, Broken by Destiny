@@ -1,0 +1,191 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+// possible solution
+// (1) is a tree for every subset
+// (2) only left/ right child could have ancester
+
+// in one tree
+// (1) could flip up and down
+// (2) left/ right could swap
+// (3) mid child could swap
+// each tree could shift left right * permutation
+
+typedef long long ll;
+const int MOD = 1e9 + 7;
+template <ll mod> // template was not stolen from
+                  // https://codeforces.com/profile/SharpEdged
+struct modnum {
+  static constexpr bool is_big_mod = mod > numeric_limits<int>::max();
+
+  using S = conditional_t<is_big_mod, ll, int>;
+  using L = conditional_t<is_big_mod, __int128, ll>;
+
+  S x;
+
+  modnum() : x(0) {}
+  modnum(ll _x) {
+    _x %= static_cast<ll>(mod);
+    if (_x < 0) {
+      _x += mod;
+    }
+    x = _x;
+  }
+
+  modnum pow(ll n) const {
+    modnum res = 1;
+    modnum cur = *this;
+    while (n > 0) {
+      if (n & 1)
+        res *= cur;
+      cur *= cur;
+      n /= 2;
+    }
+    return res;
+  }
+  modnum inv() const { return (*this).pow(mod - 2); }
+
+  modnum &operator+=(const modnum &a) {
+    x += a.x;
+    if (x >= mod)
+      x -= mod;
+    return *this;
+  }
+  modnum &operator-=(const modnum &a) {
+    if (x < a.x)
+      x += mod;
+    x -= a.x;
+    return *this;
+  }
+  modnum &operator*=(const modnum &a) {
+    x = static_cast<L>(x) * a.x % mod;
+    return *this;
+  }
+  modnum &operator/=(const modnum &a) { return *this *= a.inv(); }
+
+  friend modnum operator+(const modnum &a, const modnum &b) {
+    return modnum(a) += b;
+  }
+  friend modnum operator-(const modnum &a, const modnum &b) {
+    return modnum(a) -= b;
+  }
+  friend modnum operator*(const modnum &a, const modnum &b) {
+    return modnum(a) *= b;
+  }
+  friend modnum operator/(const modnum &a, const modnum &b) {
+    return modnum(a) /= b;
+  }
+
+  friend bool operator==(const modnum &a, const modnum &b) {
+    return a.x == b.x;
+  }
+  friend bool operator!=(const modnum &a, const modnum &b) {
+    return a.x != b.x;
+  }
+  friend bool operator<(const modnum &a, const modnum &b) { return a.x < b.x; }
+
+  friend ostream &operator<<(ostream &os, const modnum &a) {
+    os << a.x;
+    return os;
+  }
+  friend istream &operator>>(istream &is, modnum &a) {
+    ll x;
+    is >> x;
+    a = modnum(x);
+    return is;
+  }
+};
+
+using mint = modnum<MOD>;
+
+struct Combi {
+  vector<mint> _fac, _ifac;
+  int n;
+
+  Combi() {
+    n = 1;
+    _fac.assign(n + 1, 1);
+    _ifac.assign(n + 1, 1);
+  }
+
+  void check_size(int m) {
+    int need = n;
+    while (need < m)
+      need *= 2;
+    m = need;
+    if (m <= n)
+      return;
+
+    _fac.resize(m + 1);
+    _ifac.resize(m + 1);
+    for (int i = n + 1; i <= m; i++)
+      _fac[i] = i * _fac[i - 1];
+
+    _ifac[m] = _fac[m].inv();
+    for (int i = m - 1; i > n; i--)
+      _ifac[i] = _ifac[i + 1] * (i + 1);
+    n = m;
+  }
+
+  mint fac(int m) {
+    check_size(m);
+    return _fac[m];
+  }
+
+  mint ifac(int m) {
+    check_size(m);
+    return _ifac[m];
+  }
+
+  mint ncr(int n, int r) {
+    if (n < r || r < 0)
+      return 0;
+
+    return fac(n) * ifac(n - r) * ifac(r);
+  }
+
+  mint npr(int n, int r) {
+    if (n < r || r < 0)
+      return 0;
+
+    return fac(n) * ifac(n - r);
+  }
+} comb;
+
+void solve() {
+  int n, m, u, v;
+  cin >> n >> m;
+  vector<vector<int>> g(n + 1);  
+  for (int i=1;i<=m;++i){ 
+    cin >> u >> v;  
+    g[u].push_back(v);  
+    g[v].push_back(u);  
+  }
+  mint ans = 2, tmp = 0;
+  if (m>=n) ans = 0;
+  for (int i = 1;i<=n;++i){
+    if (g[i].size()>1){
+      int x = 0;
+      for (int j: g[i]){
+        x += (g[j].size() == 1);
+      }
+      if (x >= g[i].size() - 2) ans *= comb.fac(x);
+      else ans = 0;
+    }else tmp += 1;
+  }
+  if (tmp < n-1) tmp = 2; else tmp = 1;
+  cout << ans * tmp << '\n';
+}
+
+int main() {
+  ios::sync_with_stdio(false);
+  cin.tie(0);
+  cout.tie(0);
+  int t;
+  cin >> t;
+  while (t--) {
+    solve();
+  }
+  return 0;
+}
