@@ -1,0 +1,133 @@
+#include "bits/stdc++.h"
+
+// LCA(Purning): virtual tree
+// binary lifting: up[cur][0] = prt
+// bbst 
+// A(X)= X U {lca(x,y)∣x,y∈X}
+// https://codeforces.com/blog/entry/102087 [template]
+// https://codeforces.com/blog/entry/84017 [treaps]
+// https://codeforces.com/blog/entry/140066 [properties]
+
+// 1 
+// 2 4
+//   3 5
+
+using namespace std;
+
+vector<int> tin, tout;
+vector<vector<int>> g, up;
+int timer, level;
+
+void dfs(int v, int p)
+{
+    tin[v] = ++timer;
+    up[v][0] = p;
+    for (int i = 1; i <= level; ++i)
+        up[v][i] = up[up[v][i-1]][i-1];
+
+    for (int u : g[v]) {
+        if (u != p)
+            dfs(u, v);
+    }
+
+    tout[v] = ++timer;
+}
+
+bool is_ancestor(int u, int v)
+{
+    return tin[u] <= tin[v] && tout[u] >= tout[v];
+}
+
+int lca(int u, int v)
+{
+    if (is_ancestor(u, v))
+        return u;
+    if (is_ancestor(v, u))
+        return v;
+    for (int i = level; i >= 0; --i) {
+        if (!is_ancestor(up[u][i], v))
+            u = up[u][i];
+    }
+    return up[u][0];
+}
+
+void solve(){
+    int n, k, u, v;
+    cin >> n >> k;
+    n++;
+    vector<int> w(n), c(n); 
+    for (int i = 1;i<n;++i) cin >> w[i];
+    for (int i = 1;i<n;++i) cin >> c[i];
+    vector<int> last_clr(n, 0);
+    vector<set<int>> cnt(n);
+
+    timer = 0;
+    tin = vector<int>(n);
+    tout = vector<int>(n);
+    level = ceil(log2(n));
+    up = vector<vector<int>>(n, vector<int>(level + 1));
+    g = vector<vector<int>>(n);
+
+    for (int i=1;i<n-1;++i) {
+        cin >> u >> v;
+        g[u].push_back(v);
+        g[v].push_back(u);
+    }
+
+    dfs(1, 1);
+
+    stack<int> stk;
+    stk.push(1);
+    while (!stk.empty()){
+        int top = stk.top();
+        if (c[top])
+            cnt[top].insert(c[top]);
+        if (c[top] && last_clr[c[top]])
+            cnt[lca(top, last_clr[c[top]])].insert(c[top]);
+        last_clr[c[top]] = top;
+        stk.pop();
+        for (int &a: g[top]){
+            if (a != up[top][0])
+                stk.push(a);
+        }
+    }
+    long long ans = 0;
+    for (int i=1;i<n;++i){
+        ans += (cnt[i].size() >= 2 ? w[i] : 0); 
+    }
+    cout << ans << '\n';
+
+    vector<int> o_clr(n);
+    queue<int> q;
+    q.push(1);
+    while (!q.empty()){
+        auto cur = q.front();
+        q.pop();
+        if (c[cur]) o_clr[cur] = c[cur];
+        else if (cnt[cur].size()) o_clr[cur] = *(cnt[cur].begin());
+        else {
+            if (cur == 1) o_clr[1] = 1;
+            else o_clr[cur] = o_clr[up[cur][0]];
+        }
+
+        for (auto &a: g[cur]){
+            if (a != up[cur][0])
+                q.push(a);
+        }
+    }
+    for (int i=1;i<n;++i) cout << o_clr[i] << ' ';
+    cout << '\n';
+}
+
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    cout.tie(0);
+    int t;
+    cin >> t;
+    while(t--){
+        solve();
+    }
+
+    return 0;
+}
