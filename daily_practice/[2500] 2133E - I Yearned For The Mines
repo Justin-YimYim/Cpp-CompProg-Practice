@@ -1,0 +1,121 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+// assume root somewhere
+// child > 2 --> split it self ==> at least 4 is confirmed
+// child = 2 --> split parent ==> 
+// child = 1 --> ignore
+
+vector<set<int>> g;
+vector<int> deg, prt, cnt, visited;
+
+void dfs(int cur, int p){
+  prt[cur] = p;
+  for (auto &a: g[cur]){
+    if (a != p) dfs(a, cur);
+  }
+}
+
+void dfs2(int cur, int p){
+  cout << "1 " << cur << '\n';
+  visited[cur] = 1;
+  for (auto &a: g[cur]){
+    if (a != p) dfs2(a, cur);
+  }
+}
+
+void solve(){
+  int n;
+  cin >> n;
+  g = vector<set<int>>(n + 1, set<int>());
+  deg = vector<int> (n + 1, 0);
+  for (int i = 1;i<n;++i){
+    int u, v;
+    cin >> u >> v;
+    g[u].insert(v);
+    g[v].insert(u);
+    deg[u]++;
+    deg[v]++;
+  }
+  deg[1]++;
+
+  prt = vector<int> (n + 1,0);
+  cnt = vector<int> (n + 1,0);
+  dfs(1, 0);
+
+  queue<int> q;
+  set<int> del;
+  for (int i=1;i<=n;++i)
+    if (deg[i] == 1) q.push(i); 
+
+  int cur;
+  while ((cur = q.front()) != 1){
+    deg[prt[cur]]--;
+    if (deg[prt[cur]] == 1){
+      q.push(prt[cur]);
+    }
+
+    if (g[cur].size() >= 4){
+      del.insert(cur);
+      for (auto &a: g[cur]){
+        g[a].erase(cur);
+      }
+      g[cur].clear();
+    }
+
+    if (g[cur].size() == 3){
+      if (g[prt[cur]].size() == 0){
+        del.insert(cur);
+        for (auto &a: g[cur]){
+          g[a].erase(cur);
+        }
+        g[cur].clear();
+      }
+      else{
+        del.insert(prt[cur]);
+        for (auto &a: g[prt[cur]]){
+          g[a].erase(prt[cur]);
+        }
+        g[prt[cur]].clear();
+      }
+    }
+
+    q.pop();
+  }
+
+  if (g[1].size() >= 3){
+    del.insert(1);
+    for (auto &a: g[1]){
+      g[a].erase(1);
+    }
+    g[1].clear();
+  }
+
+  cout << del.size() + n << '\n';
+  for (auto &a: del){
+    cout << "2 " << a << '\n';
+  }
+
+  vector<int> head;
+  visited = vector<int>(n + 1, 0);
+  for (int i = 1;i<=n;++i){
+    if (g[i].size() != 2){
+      head.push_back(i);
+    }
+  }
+
+  for (auto &a: head) if (!visited[a]) dfs2(a, 0);
+}
+
+int main() {
+  ios::sync_with_stdio(false);
+  cin.tie(0);
+  cout.tie(0);
+  int t;
+  cin >> t;
+  while (t--) {
+    solve();
+  }
+  return 0;
+}
